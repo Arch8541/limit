@@ -1,21 +1,18 @@
 import { Project, SiteData, RegulationResult, GDCRClause, ExtractedDrawingData } from '@/types';
-import { getAuthToken } from './index';
 
 const API_BASE = '/api/projects';
 
 async function fetchWithAuth(url: string, options: RequestInit = {}) {
-  const token = getAuthToken();
-  if (!token) {
-    throw new Error('Not authenticated');
-  }
-
   const headers = {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
     ...options.headers,
   };
 
-  const response = await fetch(url, { ...options, headers });
+  const response = await fetch(url, {
+    ...options,
+    headers,
+    credentials: 'include', // Ensure cookies are sent
+  });
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({ error: 'Request failed' }));

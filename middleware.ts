@@ -6,8 +6,8 @@ export default auth((req) => {
   const pathname = req.nextUrl.pathname;
 
   const isAuthPage = pathname.startsWith('/login') || pathname.startsWith('/register');
-  const isProtectedPage = pathname.startsWith('/dashboard') || pathname.startsWith('/projects');
-  const isPublicPage = pathname === '/' || pathname.startsWith('/bulk-analysis');
+  const isProtectedPage = pathname.startsWith('/dashboard') || pathname.startsWith('/projects') || pathname.startsWith('/bulk-analysis');
+  const isPublicPage = pathname === '/';
 
   // Debug logging
   if (process.env.NODE_ENV === 'development') {

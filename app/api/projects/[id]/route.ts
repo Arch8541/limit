@@ -1,36 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
-import { jwtVerify } from 'jose';
+import { auth } from '@/auth';
 import { dbProjectToAppProject } from '@/lib/db/converters';
-
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'limit-secret-key-change-in-production'
-);
-
-async function getUserFromToken(request: NextRequest): Promise<string | null> {
-  const authHeader = request.headers.get('authorization');
-  if (!authHeader?.startsWith('Bearer ')) {
-    return null;
-  }
-
-  const token = authHeader.substring(7);
-  try {
-    const { payload } = await jwtVerify(token, JWT_SECRET);
-    return payload.userId as string;
-  } catch (error) {
-    return null;
-  }
-}
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const userId = await getUserFromToken(request);
-    if (!userId) {
+    const session = await auth();
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    const userId = session.user.id;
 
     const { id } = await params;
 
@@ -68,10 +50,11 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const userId = await getUserFromToken(request);
-    if (!userId) {
+    const session = await auth();
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    const userId = session.user.id;
 
     const { id } = await params;
     const data = await request.json();
@@ -150,10 +133,11 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const userId = await getUserFromToken(request);
-    if (!userId) {
+    const session = await auth();
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    const userId = session.user.id;
 
     const { id } = await params;
 
