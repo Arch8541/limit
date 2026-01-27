@@ -1,0 +1,572 @@
+{
+  "version": "GDCR 2017",
+  "lastUpdated": "2026-01-26",
+  "norms": [
+    {
+      "rule_id": "ROOM_LIVING_MIN",
+      "category": "Room Dimensions",
+      "element": "Living Room",
+      "requirements": {
+        "min_carpet_area": 9.5,
+        "min_width": 2.4,
+        "min_height": 2.75
+      },
+      "unit": "meters",
+      "applicable_to": ["Residential-Single", "Residential-Multi"],
+      "source": "GDCR 2017 Section 8.2.1",
+      "notes": "For tenements above 40 sq.m carpet area"
+    },
+    {
+      "rule_id": "ROOM_BEDROOM_MIN",
+      "category": "Room Dimensions",
+      "element": "Bedroom (Master)",
+      "requirements": {
+        "min_carpet_area": 9.5,
+        "min_width": 2.4,
+        "min_height": 2.75
+      },
+      "unit": "meters",
+      "applicable_to": ["Residential-Single", "Residential-Multi"],
+      "source": "GDCR 2017 Section 8.2.2"
+    },
+    {
+      "rule_id": "ROOM_BEDROOM_OTHER_MIN",
+      "category": "Room Dimensions",
+      "element": "Bedroom (Other)",
+      "requirements": {
+        "min_carpet_area": 7.5,
+        "min_width": 2.1,
+        "min_height": 2.75
+      },
+      "unit": "meters",
+      "applicable_to": ["Residential-Single", "Residential-Multi"],
+      "source": "GDCR 2017 Section 8.2.2"
+    },
+    {
+      "rule_id": "ROOM_KITCHEN_MIN",
+      "category": "Room Dimensions",
+      "element": "Kitchen",
+      "requirements": {
+        "min_carpet_area": 5.0,
+        "min_width": 1.8,
+        "min_height": 2.75
+      },
+      "unit": "meters",
+      "applicable_to": ["Residential-Single", "Residential-Multi"],
+      "source": "GDCR 2017 Section 8.2.3"
+    },
+    {
+      "rule_id": "ROOM_BATHROOM_MIN",
+      "category": "Room Dimensions",
+      "element": "Bathroom",
+      "requirements": {
+        "min_carpet_area": 2.8,
+        "min_width": 1.2,
+        "min_height": 2.4
+      },
+      "unit": "meters",
+      "applicable_to": ["Residential-Single", "Residential-Multi"],
+      "source": "GDCR 2017 Section 8.2.4"
+    },
+    {
+      "rule_id": "ROOM_WC_MIN",
+      "category": "Room Dimensions",
+      "element": "Water Closet (WC)",
+      "requirements": {
+        "min_carpet_area": 1.1,
+        "min_width": 0.9,
+        "min_height": 2.4
+      },
+      "unit": "meters",
+      "applicable_to": ["Residential-Single", "Residential-Multi", "Commercial-Office", "Commercial-Retail"],
+      "source": "GDCR 2017 Section 8.2.5"
+    },
+    {
+      "rule_id": "ROOM_STAIRCASE_RESIDENTIAL",
+      "category": "Room Dimensions",
+      "element": "Staircase (Residential)",
+      "requirements": {
+        "min_width": 0.9,
+        "min_tread": 0.25,
+        "max_riser": 0.19,
+        "min_headroom": 2.0
+      },
+      "unit": "meters",
+      "applicable_to": ["Residential-Single", "Residential-Multi"],
+      "source": "GDCR 2017 Section 8.3.1"
+    },
+    {
+      "rule_id": "ROOM_STAIRCASE_COMMERCIAL",
+      "category": "Room Dimensions",
+      "element": "Staircase (Commercial)",
+      "requirements": {
+        "min_width": 1.5,
+        "min_tread": 0.30,
+        "max_riser": 0.15,
+        "min_headroom": 2.2
+      },
+      "unit": "meters",
+      "applicable_to": ["Commercial-Office", "Commercial-Retail", "Commercial-Hospitality"],
+      "source": "GDCR 2017 Section 8.3.2"
+    },
+    {
+      "rule_id": "STRUCT_PLINTH_HEIGHT",
+      "category": "Structural Elements",
+      "element": "Plinth Height",
+      "requirements": {
+        "min_height": 0.45,
+        "recommended_height": 0.6
+      },
+      "unit": "meters",
+      "applicable_to": ["Residential-Single", "Residential-Multi", "Commercial-Office", "Commercial-Retail", "Commercial-Hospitality", "Mixed-Use"],
+      "source": "GDCR 2017 Section 8.1.1",
+      "notes": "Measured from road level or natural ground level, whichever is higher"
+    },
+    {
+      "rule_id": "STRUCT_FLOOR_HEIGHT_RESIDENTIAL",
+      "category": "Structural Elements",
+      "element": "Floor-to-Floor Height (Residential)",
+      "requirements": {
+        "min_height": 3.0,
+        "ground_floor_recommended": 3.3
+      },
+      "unit": "meters",
+      "applicable_to": ["Residential-Single", "Residential-Multi"],
+      "source": "GDCR 2017 Section 8.1.2"
+    },
+    {
+      "rule_id": "STRUCT_FLOOR_HEIGHT_COMMERCIAL",
+      "category": "Structural Elements",
+      "element": "Floor-to-Floor Height (Commercial)",
+      "requirements": {
+        "min_height": 3.6,
+        "ground_floor_min": 4.0
+      },
+      "unit": "meters",
+      "applicable_to": ["Commercial-Office", "Commercial-Retail", "Commercial-Hospitality"],
+      "source": "GDCR 2017 Section 8.1.3"
+    },
+    {
+      "rule_id": "STRUCT_PARAPET",
+      "category": "Structural Elements",
+      "element": "Parapet Wall",
+      "requirements": {
+        "min_height": 1.0,
+        "max_height": 1.2
+      },
+      "unit": "meters",
+      "applicable_to": ["Residential-Single", "Residential-Multi", "Commercial-Office", "Commercial-Retail", "Commercial-Hospitality", "Mixed-Use"],
+      "source": "GDCR 2017 Section 8.1.4",
+      "notes": "For terraces with access; measured from finished floor level"
+    },
+    {
+      "rule_id": "STRUCT_BASEMENT_CEILING",
+      "category": "Structural Elements",
+      "element": "Basement Ceiling Height",
+      "requirements": {
+        "min_height": 2.4
+      },
+      "unit": "meters",
+      "applicable_to": ["Residential-Single", "Residential-Multi", "Commercial-Office", "Commercial-Retail", "Commercial-Hospitality", "Mixed-Use"],
+      "source": "GDCR 2017 Section 8.1.5"
+    },
+    {
+      "rule_id": "OPENING_WINDOW_LIVING",
+      "category": "Openings",
+      "element": "Window (Living/Bedroom)",
+      "requirements": {
+        "min_area_percentage": 10,
+        "min_width": 0.6,
+        "min_height": 1.0,
+        "sill_height_max": 0.9
+      },
+      "unit": "meters",
+      "applicable_to": ["Residential-Single", "Residential-Multi"],
+      "source": "GDCR 2017 Section 8.4.1",
+      "notes": "Minimum 10% of floor area for natural light and ventilation"
+    },
+    {
+      "rule_id": "OPENING_WINDOW_KITCHEN",
+      "category": "Openings",
+      "element": "Window (Kitchen)",
+      "requirements": {
+        "min_area_percentage": 10,
+        "min_width": 0.6,
+        "min_height": 0.6
+      },
+      "unit": "meters",
+      "applicable_to": ["Residential-Single", "Residential-Multi"],
+      "source": "GDCR 2017 Section 8.4.2"
+    },
+    {
+      "rule_id": "OPENING_VENTILATION_BATHROOM",
+      "category": "Openings",
+      "element": "Ventilation (Bathroom/WC)",
+      "requirements": {
+        "min_area": 0.37,
+        "alternate_mechanical": true
+      },
+      "unit": "sq.m",
+      "applicable_to": ["Residential-Single", "Residential-Multi", "Commercial-Office", "Commercial-Retail", "Commercial-Hospitality"],
+      "source": "GDCR 2017 Section 8.4.3",
+      "notes": "0.37 sq.m natural ventilation OR mechanical exhaust system"
+    },
+    {
+      "rule_id": "OPENING_DOOR_MAIN",
+      "category": "Openings",
+      "element": "Main Door",
+      "requirements": {
+        "min_width": 1.0,
+        "min_height": 2.0
+      },
+      "unit": "meters",
+      "applicable_to": ["Residential-Single", "Residential-Multi"],
+      "source": "GDCR 2017 Section 8.4.4"
+    },
+    {
+      "rule_id": "OPENING_DOOR_ROOM",
+      "category": "Openings",
+      "element": "Room Door",
+      "requirements": {
+        "min_width": 0.9,
+        "min_height": 2.0
+      },
+      "unit": "meters",
+      "applicable_to": ["Residential-Single", "Residential-Multi"],
+      "source": "GDCR 2017 Section 8.4.5"
+    },
+    {
+      "rule_id": "OPENING_DOOR_BATHROOM",
+      "category": "Openings",
+      "element": "Bathroom/WC Door",
+      "requirements": {
+        "min_width": 0.75,
+        "min_height": 2.0
+      },
+      "unit": "meters",
+      "applicable_to": ["Residential-Single", "Residential-Multi"],
+      "source": "GDCR 2017 Section 8.4.6"
+    },
+    {
+      "rule_id": "SERVICE_WATER_TANK_RESIDENTIAL",
+      "category": "Services",
+      "element": "Water Tank Capacity (Residential)",
+      "requirements": {
+        "capacity_per_person": 135,
+        "min_persons_per_dwelling": 5
+      },
+      "unit": "liters",
+      "applicable_to": ["Residential-Single", "Residential-Multi"],
+      "source": "GDCR 2017 Section 9.1.1",
+      "notes": "135 liters per person per day; minimum 5 persons per dwelling unit"
+    },
+    {
+      "rule_id": "SERVICE_WATER_TANK_COMMERCIAL",
+      "category": "Services",
+      "element": "Water Tank Capacity (Commercial)",
+      "requirements": {
+        "capacity_per_sqm": 5
+      },
+      "unit": "liters",
+      "applicable_to": ["Commercial-Office", "Commercial-Retail"],
+      "source": "GDCR 2017 Section 9.1.2",
+      "notes": "5 liters per sq.m of built-up area per day"
+    },
+    {
+      "rule_id": "SERVICE_DRAINAGE_PIPE",
+      "category": "Services",
+      "element": "Drainage Pipe",
+      "requirements": {
+        "min_diameter_soil": 100,
+        "min_diameter_waste": 50,
+        "min_diameter_vent": 50,
+        "min_gradient": 1
+      },
+      "unit": "mm",
+      "applicable_to": ["Residential-Single", "Residential-Multi", "Commercial-Office", "Commercial-Retail", "Commercial-Hospitality", "Mixed-Use"],
+      "source": "GDCR 2017 Section 9.2.1",
+      "notes": "Minimum gradient: 1 in 60 (1.67%)"
+    },
+    {
+      "rule_id": "SERVICE_SEPTIC_TANK",
+      "category": "Services",
+      "element": "Septic Tank",
+      "requirements": {
+        "capacity_per_user": 180,
+        "min_capacity": 1800,
+        "length_to_width_ratio": 2.5,
+        "min_depth": 1.5,
+        "distance_from_building": 1.5,
+        "distance_from_water_source": 15
+      },
+      "unit": "liters",
+      "applicable_to": ["Residential-Single", "Residential-Multi"],
+      "source": "GDCR 2017 Section 9.2.2",
+      "notes": "Required where municipal sewerage is not available"
+    },
+    {
+      "rule_id": "SERVICE_LIFT_REQUIREMENT",
+      "category": "Services",
+      "element": "Lift/Elevator",
+      "requirements": {
+        "height_threshold": 15,
+        "min_lifts_per_building": 1,
+        "min_car_dimensions": "1.1m x 1.4m",
+        "min_door_width": 0.8
+      },
+      "unit": "meters",
+      "applicable_to": ["Residential-Multi", "Commercial-Office", "Commercial-Retail", "Commercial-Hospitality", "Mixed-Use"],
+      "source": "GDCR 2017 Section 9.3.1",
+      "notes": "Mandatory for buildings exceeding 15m height"
+    },
+    {
+      "rule_id": "FIRE_STAIRCASE_WIDTH_RESIDENTIAL",
+      "category": "Fire Safety",
+      "element": "Fire Staircase Width (Residential)",
+      "requirements": {
+        "min_width": 1.2,
+        "height_threshold": 15
+      },
+      "unit": "meters",
+      "applicable_to": ["Residential-Multi"],
+      "source": "GDCR 2017 Section 11.1.1",
+      "notes": "For buildings above 15m height"
+    },
+    {
+      "rule_id": "FIRE_STAIRCASE_WIDTH_COMMERCIAL",
+      "category": "Fire Safety",
+      "element": "Fire Staircase Width (Commercial)",
+      "requirements": {
+        "min_width": 1.5,
+        "height_threshold": 15
+      },
+      "unit": "meters",
+      "applicable_to": ["Commercial-Office", "Commercial-Retail", "Commercial-Hospitality"],
+      "source": "GDCR 2017 Section 11.1.2"
+    },
+    {
+      "rule_id": "FIRE_EXIT_DISTANCE",
+      "category": "Fire Safety",
+      "element": "Fire Exit Travel Distance",
+      "requirements": {
+        "max_distance_dead_end": 15,
+        "max_distance_two_exits": 30,
+        "max_distance_sprinklered": 45
+      },
+      "unit": "meters",
+      "applicable_to": ["Residential-Multi", "Commercial-Office", "Commercial-Retail", "Commercial-Hospitality", "Mixed-Use"],
+      "source": "GDCR 2017 Section 11.1.3"
+    },
+    {
+      "rule_id": "FIRE_EXIT_COUNT",
+      "category": "Fire Safety",
+      "element": "Number of Fire Exits",
+      "requirements": {
+        "height_15m": 2,
+        "height_24m": 2,
+        "occupant_threshold": 50
+      },
+      "unit": "count",
+      "applicable_to": ["Residential-Multi", "Commercial-Office", "Commercial-Retail", "Commercial-Hospitality", "Mixed-Use"],
+      "source": "GDCR 2017 Section 11.1.4",
+      "notes": "Minimum 2 exits for buildings above 15m or occupancy above 50 persons"
+    },
+    {
+      "rule_id": "FIRE_EQUIPMENT_HEIGHT_15M",
+      "category": "Fire Safety",
+      "element": "Fire Fighting Equipment (15m+)",
+      "requirements": {
+        "fire_extinguisher_per_floor": 2,
+        "fire_alarm_required": true,
+        "smoke_detector_required": true,
+        "emergency_lighting_required": true,
+        "fire_hose_reel": true
+      },
+      "unit": "count",
+      "applicable_to": ["Residential-Multi", "Commercial-Office", "Commercial-Retail", "Commercial-Hospitality", "Mixed-Use"],
+      "source": "GDCR 2017 Section 11.2.1",
+      "notes": "For buildings exceeding 15m height"
+    },
+    {
+      "rule_id": "FIRE_EQUIPMENT_HEIGHT_24M",
+      "category": "Fire Safety",
+      "element": "Fire Fighting Equipment (24m+)",
+      "requirements": {
+        "wet_riser_required": true,
+        "sprinkler_system_required": true,
+        "fire_pump_required": true,
+        "refuge_area_required": true
+      },
+      "unit": "boolean",
+      "applicable_to": ["Residential-Multi", "Commercial-Office", "Commercial-Retail", "Commercial-Hospitality", "Mixed-Use"],
+      "source": "GDCR 2017 Section 11.2.2",
+      "notes": "For buildings exceeding 24m height (High-rise)"
+    },
+    {
+      "rule_id": "ACCESS_RAMP_GRADIENT",
+      "category": "Accessibility",
+      "element": "Ramp Gradient",
+      "requirements": {
+        "max_gradient_ratio": "1:12",
+        "max_gradient_percentage": 8.33,
+        "max_length_per_flight": 9,
+        "min_width": 1.8,
+        "landing_min_length": 1.5
+      },
+      "unit": "meters",
+      "applicable_to": ["Residential-Single", "Residential-Multi", "Commercial-Office", "Commercial-Retail", "Commercial-Hospitality", "Mixed-Use"],
+      "source": "GDCR 2017 Section 13.1.1",
+      "notes": "Maximum 1:12 gradient for wheelchair accessibility"
+    },
+    {
+      "rule_id": "ACCESS_LIFT_DISABLED",
+      "category": "Accessibility",
+      "element": "Accessible Lift",
+      "requirements": {
+        "height_threshold": 15,
+        "min_car_width": 1.1,
+        "min_car_depth": 1.4,
+        "min_door_width": 0.9,
+        "handrails_required": true
+      },
+      "unit": "meters",
+      "applicable_to": ["Residential-Multi", "Commercial-Office", "Commercial-Retail", "Commercial-Hospitality", "Mixed-Use"],
+      "source": "GDCR 2017 Section 13.1.2"
+    },
+    {
+      "rule_id": "ACCESS_DOOR_WIDTH",
+      "category": "Accessibility",
+      "element": "Accessible Door Width",
+      "requirements": {
+        "min_clear_width": 0.9,
+        "min_entrance_width": 1.0
+      },
+      "unit": "meters",
+      "applicable_to": ["Residential-Single", "Residential-Multi", "Commercial-Office", "Commercial-Retail", "Commercial-Hospitality", "Mixed-Use"],
+      "source": "GDCR 2017 Section 13.1.3"
+    },
+    {
+      "rule_id": "ACCESS_TOILET",
+      "category": "Accessibility",
+      "element": "Accessible Toilet",
+      "requirements": {
+        "min_area": 2.2,
+        "min_width": 1.5,
+        "min_length": 1.7,
+        "grab_bars_required": true,
+        "min_door_width": 0.9
+      },
+      "unit": "meters",
+      "applicable_to": ["Commercial-Office", "Commercial-Retail", "Commercial-Hospitality", "Mixed-Use"],
+      "source": "GDCR 2017 Section 13.1.4",
+      "notes": "At least one accessible toilet required on ground floor"
+    },
+    {
+      "rule_id": "PARKING_ECS_DIMENSION",
+      "category": "Parking",
+      "element": "ECS (Equivalent Car Space)",
+      "requirements": {
+        "min_length": 5.0,
+        "min_width": 2.5,
+        "min_area": 12.5,
+        "with_circulation": 27.5
+      },
+      "unit": "meters",
+      "applicable_to": ["Residential-Single", "Residential-Multi", "Commercial-Office", "Commercial-Retail", "Commercial-Hospitality", "Mixed-Use"],
+      "source": "GDCR 2017 Section 12.1.1",
+      "notes": "12.5 sq.m per ECS; 27.5 sq.m including circulation"
+    },
+    {
+      "rule_id": "PARKING_RAMP_SLOPE",
+      "category": "Parking",
+      "element": "Parking Ramp Slope",
+      "requirements": {
+        "max_gradient_straight": 20,
+        "max_gradient_curved": 15,
+        "min_width_one_way": 3.0,
+        "min_width_two_way": 5.5,
+        "min_radius": 6.0
+      },
+      "unit": "percent",
+      "applicable_to": ["Residential-Multi", "Commercial-Office", "Commercial-Retail", "Commercial-Hospitality", "Mixed-Use"],
+      "source": "GDCR 2017 Section 12.1.2"
+    },
+    {
+      "rule_id": "PARKING_AISLE_WIDTH",
+      "category": "Parking",
+      "element": "Parking Aisle Width",
+      "requirements": {
+        "min_width_90deg": 6.0,
+        "min_width_60deg": 4.8,
+        "min_width_45deg": 3.6,
+        "min_width_parallel": 3.0
+      },
+      "unit": "meters",
+      "applicable_to": ["Residential-Multi", "Commercial-Office", "Commercial-Retail", "Commercial-Hospitality", "Mixed-Use"],
+      "source": "GDCR 2017 Section 12.1.3"
+    },
+    {
+      "rule_id": "PARKING_DISABLED",
+      "category": "Parking",
+      "element": "Disabled Parking Space",
+      "requirements": {
+        "min_width": 3.6,
+        "min_length": 5.0,
+        "min_count": 1,
+        "percentage_above_40": 2
+      },
+      "unit": "meters",
+      "applicable_to": ["Residential-Multi", "Commercial-Office", "Commercial-Retail", "Commercial-Hospitality", "Mixed-Use"],
+      "source": "GDCR 2017 Section 12.1.4",
+      "notes": "Minimum 1 space; 2% of total parking for facilities with 40+ spaces"
+    },
+    {
+      "rule_id": "COMMON_CORRIDOR_RESIDENTIAL",
+      "category": "Common Areas",
+      "element": "Corridor (Residential)",
+      "requirements": {
+        "min_width": 1.2,
+        "min_width_dead_end": 1.5
+      },
+      "unit": "meters",
+      "applicable_to": ["Residential-Multi"],
+      "source": "GDCR 2017 Section 10.1.1"
+    },
+    {
+      "rule_id": "COMMON_CORRIDOR_COMMERCIAL",
+      "category": "Common Areas",
+      "element": "Corridor (Commercial)",
+      "requirements": {
+        "min_width": 1.8,
+        "min_width_dead_end": 2.0
+      },
+      "unit": "meters",
+      "applicable_to": ["Commercial-Office", "Commercial-Retail", "Commercial-Hospitality"],
+      "source": "GDCR 2017 Section 10.1.2"
+    },
+    {
+      "rule_id": "COMMON_LOBBY",
+      "category": "Common Areas",
+      "element": "Entrance Lobby",
+      "requirements": {
+        "min_area": 10,
+        "min_width": 2.4
+      },
+      "unit": "sq.m",
+      "applicable_to": ["Residential-Multi", "Commercial-Office", "Commercial-Retail", "Commercial-Hospitality", "Mixed-Use"],
+      "source": "GDCR 2017 Section 10.1.3"
+    },
+    {
+      "rule_id": "COMMON_LIFT_LOBBY",
+      "category": "Common Areas",
+      "element": "Lift Lobby",
+      "requirements": {
+        "min_area": 6,
+        "min_width": 2.0
+      },
+      "unit": "sq.m",
+      "applicable_to": ["Residential-Multi", "Commercial-Office", "Commercial-Retail", "Commercial-Hospitality", "Mixed-Use"],
+      "source": "GDCR 2017 Section 10.1.4"
+    }
+  ]
+}

@@ -39,3 +39,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# documentation (not needed in repo)
+CLAUDE.md
+DEPLOYMENT.md
+IMPLEMENTATION_SUMMARY.md
+UI_DESIGN_GUIDE.md
+
+# misc files
+*.stackdump
+*.webp

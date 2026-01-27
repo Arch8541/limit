@@ -1,0 +1,274 @@
+{
+  "zones": {
+    "R1": {
+      "name": "Residential Zone 1",
+      "baseFSI": 1.8,
+      "maxFSI": 2.4,
+      "maxHeight": 15,
+      "groundCoverage": 40,
+      "fsiPremium": [
+        {
+          "roadWidth": { "min": 0, "max": 9 },
+          "premium": 0
+        },
+        {
+          "roadWidth": { "min": 9, "max": 12 },
+          "premium": 0.1
+        },
+        {
+          "roadWidth": { "min": 12, "max": 18 },
+          "premium": 0.2
+        },
+        {
+          "roadWidth": { "min": 18, "max": 999 },
+          "premium": 0.4
+        }
+      ],
+      "setbacks": {
+        "front": [
+          { "roadWidth": { "min": 0, "max": 9 }, "setback": 3 },
+          { "roadWidth": { "min": 9, "max": 12 }, "setback": 4.5 },
+          { "roadWidth": { "min": 12, "max": 18 }, "setback": 6 },
+          { "roadWidth": { "min": 18, "max": 999 }, "setback": 9 }
+        ],
+        "side": [
+          { "height": { "min": 0, "max": 10 }, "setback": 0 },
+          { "height": { "min": 10, "max": 15 }, "setback": 3 }
+        ],
+        "rear": 3
+      }
+    },
+    "R2": {
+      "name": "Residential Zone 2",
+      "baseFSI": 1.8,
+      "maxFSI": 2.7,
+      "maxHeight": 18,
+      "groundCoverage": 50,
+      "fsiPremium": [
+        {
+          "roadWidth": { "min": 0, "max": 9 },
+          "premium": 0
+        },
+        {
+          "roadWidth": { "min": 9, "max": 12 },
+          "premium": 0.2
+        },
+        {
+          "roadWidth": { "min": 12, "max": 18 },
+          "premium": 0.4
+        },
+        {
+          "roadWidth": { "min": 18, "max": 999 },
+          "premium": 0.6
+        }
+      ],
+      "setbacks": {
+        "front": [
+          { "roadWidth": { "min": 0, "max": 9 }, "setback": 3 },
+          { "roadWidth": { "min": 9, "max": 12 }, "setback": 4.5 },
+          { "roadWidth": { "min": 12, "max": 18 }, "setback": 6 },
+          { "roadWidth": { "min": 18, "max": 999 }, "setback": 9 }
+        ],
+        "side": [
+          { "height": { "min": 0, "max": 10 }, "setback": 0 },
+          { "height": { "min": 10, "max": 15 }, "setback": 3 },
+          { "height": { "min": 15, "max": 18 }, "setback": 4.5 }
+        ],
+        "rear": 3
+      }
+    },
+    "Commercial": {
+      "name": "Commercial Zone",
+      "baseFSI": 2.0,
+      "maxFSI": 4.0,
+      "maxHeight": 24,
+      "groundCoverage": 60,
+      "fsiPremium": [
+        {
+          "roadWidth": { "min": 0, "max": 9 },
+          "premium": 0
+        },
+        {
+          "roadWidth": { "min": 9, "max": 12 },
+          "premium": 0.5
+        },
+        {
+          "roadWidth": { "min": 12, "max": 18 },
+          "premium": 1.0
+        },
+        {
+          "roadWidth": { "min": 18, "max": 999 },
+          "premium": 1.5
+        }
+      ],
+      "setbacks": {
+        "front": [
+          { "roadWidth": { "min": 0, "max": 9 }, "setback": 3 },
+          { "roadWidth": { "min": 9, "max": 12 }, "setback": 4.5 },
+          { "roadWidth": { "min": 12, "max": 18 }, "setback": 6 },
+          { "roadWidth": { "min": 18, "max": 999 }, "setback": 9 }
+        ],
+        "side": [
+          { "height": { "min": 0, "max": 15 }, "setback": 0 },
+          { "height": { "min": 15, "max": 24 }, "setback": 4.5 }
+        ],
+        "rear": 4.5
+      }
+    },
+    "Industrial": {
+      "name": "Industrial Zone",
+      "baseFSI": 1.5,
+      "maxFSI": 1.8,
+      "maxHeight": 15,
+      "groundCoverage": 50,
+      "fsiPremium": [
+        {
+          "roadWidth": { "min": 0, "max": 12 },
+          "premium": 0
+        },
+        {
+          "roadWidth": { "min": 12, "max": 18 },
+          "premium": 0.2
+        },
+        {
+          "roadWidth": { "min": 18, "max": 999 },
+          "premium": 0.3
+        }
+      ],
+      "setbacks": {
+        "front": [
+          { "roadWidth": { "min": 0, "max": 12 }, "setback": 6 },
+          { "roadWidth": { "min": 12, "max": 999 }, "setback": 9 }
+        ],
+        "side": [
+          { "height": { "min": 0, "max": 999 }, "setback": 4.5 }
+        ],
+        "rear": 6
+      }
+    },
+    "Mixed-Use": {
+      "name": "Mixed-Use Zone",
+      "baseFSI": 1.9,
+      "maxFSI": 3.0,
+      "maxHeight": 21,
+      "groundCoverage": 55,
+      "fsiPremium": [
+        {
+          "roadWidth": { "min": 0, "max": 9 },
+          "premium": 0
+        },
+        {
+          "roadWidth": { "min": 9, "max": 12 },
+          "premium": 0.3
+        },
+        {
+          "roadWidth": { "min": 12, "max": 18 },
+          "premium": 0.6
+        },
+        {
+          "roadWidth": { "min": 18, "max": 999 },
+          "premium": 0.9
+        }
+      ],
+      "setbacks": {
+        "front": [
+          { "roadWidth": { "min": 0, "max": 9 }, "setback": 3 },
+          { "roadWidth": { "min": 9, "max": 12 }, "setback": 4.5 },
+          { "roadWidth": { "min": 12, "max": 18 }, "setback": 6 },
+          { "roadWidth": { "min": 18, "max": 999 }, "setback": 9 }
+        ],
+        "side": [
+          { "height": { "min": 0, "max": 10 }, "setback": 0 },
+          { "height": { "min": 10, "max": 15 }, "setback": 3 },
+          { "height": { "min": 15, "max": 999 }, "setback": 4.5 }
+        ],
+        "rear": 3
+      }
+    }
+  },
+  "parking": {
+    "Residential-Single": {
+      "ecsPerBuiltup": 1,
+      "builtupUnit": 75,
+      "description": "1 ECS per 75 sq.m built-up area"
+    },
+    "Residential-Multi": {
+      "ecsPerBuiltup": 1,
+      "builtupUnit": 75,
+      "description": "1 ECS per 75 sq.m built-up area"
+    },
+    "Commercial-Office": {
+      "ecsPerBuiltup": 1.5,
+      "builtupUnit": 100,
+      "description": "1.5 ECS per 100 sq.m built-up area"
+    },
+    "Commercial-Retail": {
+      "ecsPerBuiltup": 2,
+      "builtupUnit": 100,
+      "description": "2 ECS per 100 sq.m built-up area"
+    },
+    "Commercial-Hospitality": {
+      "ecsPerBuiltup": 1.5,
+      "builtupUnit": 100,
+      "description": "1.5 ECS per 100 sq.m built-up area"
+    },
+    "Mixed-Use": {
+      "ecsPerBuiltup": 1.25,
+      "builtupUnit": 85,
+      "description": "1.25 ECS per 85 sq.m built-up area (proportional)"
+    },
+    "ecsArea": 27.5,
+    "ecsDescription": "1 ECS (Equivalent Car Space) = 27.5 sq.m minimum"
+  },
+  "structural": {
+    "plinthHeight": {
+      "min": 0.45,
+      "max": 0.6,
+      "description": "Minimum 0.45m, recommended 0.6m above road level"
+    },
+    "floorHeight": {
+      "residential": 3.0,
+      "commercial": 3.6,
+      "description": "Minimum floor-to-floor height"
+    },
+    "parapet": {
+      "min": 1.0,
+      "max": 1.2,
+      "description": "Parapet wall height for terrace access"
+    }
+  },
+  "fireSafety": {
+    "heightThreshold": 15,
+    "requirements": [
+      "Fire detection and alarm system",
+      "Fire extinguishers on each floor",
+      "Emergency exit signage",
+      "Staircase with fire-resistant materials",
+      "Fire NOC from Fire Department mandatory"
+    ]
+  },
+  "accessibility": {
+    "rampRequired": true,
+    "liftThreshold": 15,
+    "requirements": [
+      "Ramp with 1:12 gradient for main entrance",
+      "Accessible parking space (min 1 ECS)",
+      "Lift required for buildings above 15m",
+      "Accessible toilet on ground floor"
+    ]
+  },
+  "cornerPlotBonus": {
+    "fsiBonus": 0.1,
+    "description": "Additional 0.1 FSI for corner plots"
+  },
+  "gdcrClauses": {
+    "fsi": "Clause 7.2 - Floor Space Index",
+    "height": "Clause 7.3 - Building Height",
+    "setbacks": "Clause 7.4 - Setback Requirements",
+    "groundCoverage": "Clause 7.5 - Ground Coverage",
+    "parking": "Clause 12.1 - Parking Norms",
+    "structural": "Clause 8.1 - Structural Requirements",
+    "fireSafety": "Clause 11.1 - Fire Safety Norms",
+    "accessibility": "Clause 13.1 - Accessibility Standards"
+  }
+}
