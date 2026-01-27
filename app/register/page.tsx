@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { signIn } from 'next-auth/react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
@@ -51,24 +50,8 @@ export default function RegisterPage() {
         return;
       }
 
-      // Auto-login after successful registration
-      const signInResult = await signIn('credentials', {
-        email,
-        password,
-        redirect: false,
-      });
-
-      if (signInResult?.error) {
-        // Registration succeeded but login failed - redirect to login page
-        router.push('/login?registered=true');
-      } else if (signInResult?.ok) {
-        // Both registration and login succeeded - redirect to dashboard
-        router.push('/dashboard');
-        router.refresh();
-      } else {
-        setError('Registration succeeded but login failed. Please login manually.');
-        setTimeout(() => router.push('/login?registered=true'), 2000);
-      }
+      // Registration successful - redirect to login page
+      router.push('/login?registered=true');
     } catch (err) {
       console.error('Registration error:', err);
       setError('An unexpected error occurred');
