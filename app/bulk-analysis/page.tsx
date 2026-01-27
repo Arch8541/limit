@@ -11,7 +11,7 @@ import { Project } from '@/types';
 import { ComparativeView } from '@/components/comparative/ComparativeView';
 import { Progress, CircularProgress } from '@/components/ui/Progress';
 import { SuccessAnimation } from '@/components/ui/SuccessAnimation';
-import { createProject, addRegulationResults } from '@/lib/storage/projects';
+import { createProject, addRegulationResults } from '@/lib/storage/projects-api';
 import { getCurrentUser } from '@/lib/auth';
 
 export default function BulkAnalysisPage() {
@@ -22,6 +22,7 @@ export default function BulkAnalysisPage() {
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [navigatingTo, setNavigatingTo] = useState<string | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -64,13 +65,13 @@ export default function BulkAnalysisPage() {
         const siteData = csvRowToSiteData(row);
 
         // Create project
-        const project = createProject(user.id, siteData);
+        const project = await createProject(user.id, siteData);
 
         // Calculate regulations
         const { result, clauses } = calculateRegulations(siteData);
 
         // Add regulation results
-        const updatedProject = addRegulationResults(project.id, result, clauses);
+        const updatedProject = await addRegulationResults(project.id, result, clauses);
 
         if (updatedProject) {
           projects.push(updatedProject);
@@ -96,6 +97,11 @@ export default function BulkAnalysisPage() {
     downloadCSV('bulk-analysis-results.csv', csv);
   };
 
+  const handleNavigation = (path: string) => {
+    setNavigatingTo(path);
+    router.push(path);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-stone-50 via-white to-teal-50">
       {/* Header */}
@@ -103,8 +109,14 @@ export default function BulkAnalysisPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <Button variant="ghost" size="sm" onClick={() => router.push('/dashboard')}>
-                <ArrowLeft className="w-4 h-4" />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleNavigation('/dashboard')}
+                isLoading={navigatingTo === '/dashboard'}
+                disabled={navigatingTo !== null}
+              >
+                {navigatingTo !== '/dashboard' && <ArrowLeft className="w-4 h-4" />}
               </Button>
               <div className="w-12 h-12 bg-gradient-to-br from-teal-600 to-teal-500 rounded-2xl flex items-center justify-center shadow-lg shadow-teal-500/30">
                 <FileSpreadsheet className="w-7 h-7 text-white" />
@@ -289,7 +301,7 @@ export default function BulkAnalysisPage() {
                     <Download className="w-4 h-4 mr-2" />
                     Export Results
                   </Button>
-                  <Button variant="ghost" onClick={() => setProcessedProjects([])}>
+                  <Button variant="ghost" onClick={() => { setProcessedProjects([]); setNavigatingTo(null); }}>
                     Process New File
                   </Button>
                 </div>
@@ -310,8 +322,8 @@ export default function BulkAnalysisPage() {
                   {processedProjects.map((project) => (
                     <div
                       key={project.id}
-                      className="glass rounded-2xl p-5 hover-lift cursor-pointer border border-stone-200"
-                      onClick={() => router.push(`/projects/${project.id}`)}
+                      className={`glass rounded-2xl p-5 hover-lift cursor-pointer border border-stone-200 ${navigatingTo === `/projects/${project.id}` ? 'opacity-50' : ''}`}
+                      onClick={() => handleNavigation(`/projects/${project.id}`)}
                     >
                       <h4 className="font-bold text-gray-900 mb-3">{project.siteData?.projectName || 'Unnamed'}</h4>
                       <div className="space-y-2 text-sm">

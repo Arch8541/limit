@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { getProject } from '@/lib/storage/projects';
+import { getProject } from '@/lib/storage/projects-api';
 import { Project } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { Building2, ArrowLeft, Printer, Download } from 'lucide-react';
@@ -12,23 +12,58 @@ export default function ReportPage() {
   const params = useParams();
   const [project, setProject] = useState<Project | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [navigatingTo, setNavigatingTo] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
-    if (params.id) {
-      const proj = getProject(params.id as string);
-      setProject(proj);
-    }
+    const loadProject = async () => {
+      if (params.id) {
+        setIsLoading(true);
+        try {
+          const proj = await getProject(params.id as string);
+          setProject(proj);
+        } catch (error) {
+          console.error('Failed to load project:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+    loadProject();
   }, [params.id]);
 
   const handlePrint = () => {
     window.print();
   };
 
-  if (!mounted || !project) {
+  const handleNavigation = (path: string) => {
+    setNavigatingTo(path);
+    router.push(path);
+  };
+
+  if (!mounted || isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-500">Loading...</p>
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <Building2 className="w-10 h-10 text-white" />
+          </div>
+          <p className="text-gray-600 font-medium">Loading report...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!project) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="text-center">
+          <p className="text-gray-600 font-medium">Report not found</p>
+          <Button onClick={() => router.push('/dashboard')} className="mt-4">
+            Back to Dashboard
+          </Button>
+        </div>
       </div>
     );
   }
@@ -41,8 +76,14 @@ export default function ReportPage() {
       <div className="no-print bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Button variant="ghost" size="sm" onClick={() => router.push(`/projects/${project.id}`)}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleNavigation(`/projects/${project.id}`)}
+              isLoading={navigatingTo === `/projects/${project.id}`}
+              disabled={navigatingTo !== null}
+            >
+              {navigatingTo !== `/projects/${project.id}` && <ArrowLeft className="w-4 h-4 mr-2" />}
               Back to Project
             </Button>
             <Button onClick={handlePrint}>

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { getProject } from '@/lib/storage/projects';
+import { getProject } from '@/lib/storage/projects-api';
 import { Project } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
@@ -28,19 +28,54 @@ export default function ProjectDetailPage() {
   const params = useParams();
   const [project, setProject] = useState<Project | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [navigatingTo, setNavigatingTo] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
-    if (params.id) {
-      const proj = getProject(params.id as string);
-      setProject(proj);
-    }
+    const loadProject = async () => {
+      if (params.id) {
+        setIsLoading(true);
+        try {
+          const proj = await getProject(params.id as string);
+          setProject(proj);
+        } catch (error) {
+          console.error('Failed to load project:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+    loadProject();
   }, [params.id]);
 
-  if (!mounted || !project) {
+  const handleNavigation = (path: string) => {
+    setNavigatingTo(path);
+    router.push(path);
+  };
+
+  if (!mounted || isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-500">Loading...</p>
+      <div className="min-h-screen gradient-mesh flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-gradient-to-br from-cyan-600 via-cyan-500 to-cyan-600 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <Building2 className="w-10 h-10 text-white" />
+          </div>
+          <p className="text-slate-600 font-medium">Loading project...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!project) {
+    return (
+      <div className="min-h-screen gradient-mesh flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-slate-600 font-medium">Project not found</p>
+          <Button onClick={() => router.push('/dashboard')} className="mt-4">
+            Back to Dashboard
+          </Button>
+        </div>
       </div>
     );
   }
@@ -54,8 +89,14 @@ export default function ProjectDetailPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="sm" onClick={() => router.push('/dashboard')}>
-                <ArrowLeft className="w-4 h-4" />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleNavigation('/dashboard')}
+                isLoading={navigatingTo === '/dashboard'}
+                disabled={navigatingTo !== null}
+              >
+                {navigatingTo !== '/dashboard' && <ArrowLeft className="w-4 h-4" />}
               </Button>
               <div className="w-12 h-12 bg-gradient-to-br from-cyan-600 via-cyan-500 to-cyan-600 rounded-xl flex items-center justify-center shadow-md hover:shadow-lg hover:shadow-cyan-500/30 transition-all">
                 <Building2 className="w-7 h-7 text-white" />
@@ -69,8 +110,12 @@ export default function ProjectDetailPage() {
             </div>
             <div className="flex gap-3">
               {regulationResult && (
-                <Button onClick={() => router.push(`/projects/${project.id}/report`)}>
-                  <FileText className="w-4 h-4 mr-2" />
+                <Button
+                  onClick={() => handleNavigation(`/projects/${project.id}/report`)}
+                  isLoading={navigatingTo === `/projects/${project.id}/report`}
+                  disabled={navigatingTo !== null}
+                >
+                  {navigatingTo !== `/projects/${project.id}/report` && <FileText className="w-4 h-4 mr-2" />}
                   View Report
                 </Button>
               )}

@@ -3,9 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getCurrentUser } from '@/lib/auth';
-import { createProject } from '@/lib/storage/projects';
+import { createProject, addRegulationResults } from '@/lib/storage/projects-api';
 import { calculateRegulations } from '@/lib/calculations/regulation-engine';
-import { addRegulationResults } from '@/lib/storage/projects';
 import { SiteData, Authority, Zone, IntendedUse } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -19,6 +18,7 @@ export default function NewProjectPage() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
 
   // Form state
   const [projectName, setProjectName] = useState('');
@@ -78,21 +78,22 @@ export default function NewProjectPage() {
       };
 
       // Create project
-      const project = createProject(user.id, siteData);
+      const project = await createProject(user.id, siteData);
 
       // Calculate regulations
       const { result, clauses } = calculateRegulations(siteData);
 
       // Add regulation results
-      addRegulationResults(project.id, result, clauses);
+      await addRegulationResults(project.id, result, clauses);
 
       // Navigate to project detail
+      setIsNavigating(true);
       router.push(`/projects/${project.id}`);
     } catch (error) {
       console.error('Error creating project:', error);
       alert('Failed to create project');
-    } finally {
       setIsLoading(false);
+      setIsNavigating(false);
     }
   };
 
@@ -376,11 +377,11 @@ export default function NewProjectPage() {
                   type="submit"
                   size="lg"
                   fullWidth
-                  isLoading={isLoading}
-                  disabled={!isStep1Valid || isLoading}
+                  isLoading={isLoading || isNavigating}
+                  disabled={!isStep1Valid || isLoading || isNavigating}
                 >
-                  <Calculator className="w-4 h-4 mr-2" />
-                  Calculate Regulations
+                  {!isLoading && !isNavigating && <Calculator className="w-4 h-4 mr-2" />}
+                  {isNavigating ? 'Redirecting...' : (isLoading ? 'Calculating...' : 'Calculate Regulations')}
                 </Button>
               </div>
             </form>

@@ -32,6 +32,35 @@ export async function GET(request: NextRequest) {
     const dbProjects = await prisma.project.findMany({
       where: { userId },
       orderBy: { updatedAt: 'desc' },
+      // Select only needed fields for list view - improves performance
+      select: {
+        id: true,
+        userId: true,
+        name: true,
+        address: true,
+        latitude: true,
+        longitude: true,
+        authority: true,
+        zone: true,
+        plotLength: true,
+        plotWidth: true,
+        plotArea: true,
+        isCornerPlot: true,
+        roadWidthPrimary: true,
+        roadWidthSecondary: true,
+        intendedUse: true,
+        heritage: true,
+        toz: true,
+        sez: true,
+        status: true,
+        reportId: true,
+        thumbnail: true,
+        regulationResult: true,
+        gdcrClauses: true,
+        extractedData: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
 
     // Parse JSON fields

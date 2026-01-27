@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
-import { getUserProjects, deleteProject } from '@/lib/storage/projects';
+import { getUserProjects, deleteProject } from '@/lib/storage/projects-api';
 import { Project } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
@@ -27,6 +27,10 @@ export default function DashboardPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isLoadingProjects, setIsLoadingProjects] = useState(false);
+  const [deletingProjectId, setDeletingProjectId] = useState<string | null>(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [navigatingTo, setNavigatingTo] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -39,11 +43,18 @@ export default function DashboardPage() {
     }
   }, [status, session, router]);
 
-  const loadProjects = () => {
+  const loadProjects = async () => {
     if (session?.user?.id) {
-      const userProjects = getUserProjects(session.user.id);
-      setProjects(userProjects);
-      setFilteredProjects(userProjects);
+      setIsLoadingProjects(true);
+      try {
+        const userProjects = await getUserProjects(session.user.id);
+        setProjects(userProjects);
+        setFilteredProjects(userProjects);
+      } catch (error) {
+        console.error('Failed to load projects:', error);
+      } finally {
+        setIsLoadingProjects(false);
+      }
     }
   };
 
@@ -62,17 +73,36 @@ export default function DashboardPage() {
     }
   };
 
-  const handleDelete = (projectId: string) => {
+  const handleNavigation = (path: string) => {
+    setNavigatingTo(path);
+    router.push(path);
+  };
+
+  const handleDelete = async (projectId: string) => {
     if (confirm('Are you sure you want to delete this project?')) {
-      deleteProject(projectId);
-      loadProjects();
+      setDeletingProjectId(projectId);
+      try {
+        await deleteProject(projectId);
+        await loadProjects();
+      } catch (error) {
+        console.error('Failed to delete project:', error);
+        alert('Failed to delete project');
+      } finally {
+        setDeletingProjectId(null);
+      }
     }
   };
 
   const handleLogout = async () => {
-    await signOut({ redirect: false });
-    router.push('/');
-    router.refresh();
+    setIsLoggingOut(true);
+    try {
+      await signOut({ redirect: false });
+      router.push('/');
+      router.refresh();
+    } catch (error) {
+      console.error('Logout failed:', error);
+      setIsLoggingOut(false);
+    }
   };
 
   const getStatusColor = (status: Project['status']) => {
@@ -127,9 +157,9 @@ export default function DashboardPage() {
                 <p className="text-sm font-bold text-slate-900">{user?.name}</p>
                 <p className="text-xs text-slate-600 font-medium">{user?.email}</p>
               </div>
-              <Button variant="ghost" size="sm" onClick={handleLogout}>
-                <LogOut className="w-4 h-4 mr-2" />
-                Logout
+              <Button variant="ghost" size="sm" onClick={handleLogout} isLoading={isLoggingOut} disabled={isLoggingOut}>
+                {!isLoggingOut && <LogOut className="w-4 h-4 mr-2" />}
+                {isLoggingOut ? 'Logging out...' : 'Logout'}
               </Button>
             </div>
           </div>
@@ -149,13 +179,19 @@ export default function DashboardPage() {
           <div className="flex gap-4 w-full sm:w-auto">
             <Button
               variant="secondary"
-              onClick={() => router.push('/bulk-analysis')}
+              onClick={() => handleNavigation('/bulk-analysis')}
+              isLoading={navigatingTo === '/bulk-analysis'}
+              disabled={navigatingTo !== null}
             >
-              <Upload className="w-4 h-4 mr-2" />
+              {navigatingTo !== '/bulk-analysis' && <Upload className="w-4 h-4 mr-2" />}
               Bulk Analysis
             </Button>
-            <Button onClick={() => router.push('/projects/new')}>
-              <Plus className="w-4 h-4 mr-2" />
+            <Button
+              onClick={() => handleNavigation('/projects/new')}
+              isLoading={navigatingTo === '/projects/new'}
+              disabled={navigatingTo !== null}
+            >
+              {navigatingTo !== '/projects/new' && <Plus className="w-4 h-4 mr-2" />}
               New Project
             </Button>
           </div>
@@ -173,7 +209,16 @@ export default function DashboardPage() {
         </div>
 
         {/* Projects Grid */}
-        {filteredProjects.length === 0 ? (
+        {isLoadingProjects ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-gradient-to-br from-cyan-600 via-cyan-500 to-cyan-600 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
+                <Building2 className="w-10 h-10 text-white" />
+              </div>
+              <p className="text-slate-600 font-medium">Loading projects...</p>
+            </div>
+          </div>
+        ) : filteredProjects.length === 0 ? (
           <Card glass className="border border-slate-200/60">
             <CardContent className="py-20 text-center">
               <div className="w-20 h-20 bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl flex items-center justify-center mx-auto mb-6">
@@ -188,8 +233,12 @@ export default function DashboardPage() {
                   : 'Create your first project to start analyzing building regulations'}
               </p>
               {!searchQuery && (
-                <Button onClick={() => router.push('/projects/new')}>
-                  <Plus className="w-4 h-4 mr-2" />
+                <Button
+                  onClick={() => handleNavigation('/projects/new')}
+                  isLoading={navigatingTo === '/projects/new'}
+                  disabled={navigatingTo !== null}
+                >
+                  {navigatingTo !== '/projects/new' && <Plus className="w-4 h-4 mr-2" />}
                   Create First Project
                 </Button>
               )}
@@ -202,8 +251,8 @@ export default function DashboardPage() {
                 key={project.id}
                 hover
                 glass
-                className="cursor-pointer border border-slate-200/60"
-                onClick={() => router.push(`/projects/${project.id}`)}
+                className={`cursor-pointer border border-slate-200/60 ${navigatingTo === `/projects/${project.id}` ? 'opacity-50' : ''}`}
+                onClick={() => handleNavigation(`/projects/${project.id}`)}
               >
                 <CardHeader>
                   <div className="flex items-start justify-between">
@@ -261,10 +310,12 @@ export default function DashboardPage() {
                         fullWidth
                         onClick={(e) => {
                           e.stopPropagation();
-                          router.push(`/projects/${project.id}/report`);
+                          handleNavigation(`/projects/${project.id}/report`);
                         }}
+                        isLoading={navigatingTo === `/projects/${project.id}/report`}
+                        disabled={navigatingTo !== null}
                       >
-                        <FileText className="w-4 h-4 mr-2" />
+                        {navigatingTo !== `/projects/${project.id}/report` && <FileText className="w-4 h-4 mr-2" />}
                         Report
                       </Button>
                     )}
@@ -275,8 +326,14 @@ export default function DashboardPage() {
                         e.stopPropagation();
                         handleDelete(project.id);
                       }}
+                      isLoading={deletingProjectId === project.id}
+                      disabled={deletingProjectId === project.id}
                     >
-                      <Trash2 className="w-4 h-4" />
+                      {deletingProjectId === project.id ? (
+                        <span className="text-xs">Deleting...</span>
+                      ) : (
+                        <Trash2 className="w-4 h-4" />
+                      )}
                     </Button>
                   </div>
                 </CardContent>
