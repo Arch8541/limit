@@ -2,10 +2,10 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
-import { register } from '@/lib/auth';
 import { Building2, Mail, Lock, User } from 'lucide-react';
 import Link from 'next/link';
 
@@ -36,14 +36,41 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      const result = await register(email, password, name);
+      // Register user via API
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, name }),
+      });
 
-      if (result.success) {
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || 'Registration failed');
+        setIsLoading(false);
+        return;
+      }
+
+      // Auto-login after successful registration
+      const signInResult = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (signInResult?.error) {
+        // Registration succeeded but login failed - redirect to login page
         router.push('/login?registered=true');
+      } else if (signInResult?.ok) {
+        // Both registration and login succeeded - redirect to dashboard
+        router.push('/dashboard');
+        router.refresh();
       } else {
-        setError(result.error || 'Registration failed');
+        setError('Registration succeeded but login failed. Please login manually.');
+        setTimeout(() => router.push('/login?registered=true'), 2000);
       }
     } catch (err) {
+      console.error('Registration error:', err);
       setError('An unexpected error occurred');
     } finally {
       setIsLoading(false);

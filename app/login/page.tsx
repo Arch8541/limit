@@ -2,10 +2,10 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
-import { login } from '@/lib/auth';
 import { Building2, Mail, Lock } from 'lucide-react';
 import Link from 'next/link';
 
@@ -22,14 +22,22 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const result = await login(email, password);
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      });
 
-      if (result.success) {
+      if (result?.error) {
+        setError('Invalid email or password');
+      } else if (result?.ok) {
         router.push('/dashboard');
+        router.refresh();
       } else {
-        setError(result.error || 'Login failed');
+        setError('Login failed. Please try again.');
       }
     } catch (err) {
+      console.error('Login error:', err);
       setError('An unexpected error occurred');
     } finally {
       setIsLoading(false);

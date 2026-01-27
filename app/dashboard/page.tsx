@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { isAuthenticated, getCurrentUser, logout } from '@/lib/auth';
+import { useSession, signOut } from 'next-auth/react';
 import { getUserProjects, deleteProject } from '@/lib/storage/projects';
 import { Project } from '@/types';
 import { Button } from '@/components/ui/Button';
@@ -23,26 +23,25 @@ import {
 
 export default function DashboardPage() {
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [projects, setProjects] = useState<Project[]>([]);
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-
-    if (!isAuthenticated()) {
+    if (status === 'unauthenticated') {
       router.push('/login');
       return;
     }
 
-    loadProjects();
-  }, [router]);
+    if (status === 'authenticated' && session?.user) {
+      loadProjects();
+    }
+  }, [status, session, router]);
 
   const loadProjects = () => {
-    const user = getCurrentUser();
-    if (user) {
-      const userProjects = getUserProjects(user.id);
+    if (session?.user?.id) {
+      const userProjects = getUserProjects(session.user.id);
       setProjects(userProjects);
       setFilteredProjects(userProjects);
     }
@@ -70,9 +69,10 @@ export default function DashboardPage() {
     }
   };
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await signOut({ redirect: false });
     router.push('/');
+    router.refresh();
   };
 
   const getStatusColor = (status: Project['status']) => {
@@ -88,11 +88,24 @@ export default function DashboardPage() {
     }
   };
 
-  if (!mounted) {
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen gradient-mesh flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-gradient-to-br from-cyan-600 via-cyan-500 to-cyan-600 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <Building2 className="w-10 h-10 text-white" />
+          </div>
+          <p className="text-slate-600 font-medium">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!session?.user) {
     return null;
   }
 
-  const user = getCurrentUser();
+  const user = session.user;
 
   return (
     <div className="min-h-screen gradient-mesh">
