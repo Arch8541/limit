@@ -49,3 +49,5 @@ UI_DESIGN_GUIDE.md
 # misc files
 *.stackdump
 *.webp
+
+/lib/generated/prisma

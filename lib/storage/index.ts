@@ -46,3 +46,8 @@ export function clearStorage(): void {
     console.error('Error clearing localStorage:', error);
   }
 }
+
+// Auth token helper
+export function getAuthToken(): string | null {
+  return getItem<string>(STORAGE_KEYS.AUTH_TOKEN);
+}
