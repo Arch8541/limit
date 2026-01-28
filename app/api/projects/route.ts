@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import { auth } from '@/auth';
 import { dbProjectToAppProject } from '@/lib/db/converters';
+import { z } from 'zod';
 
 export async function GET(request: NextRequest) {
   try {
@@ -60,11 +61,31 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Get projects error:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch projects' },
+      { error: 'Failed to fetch projects. Please try again later.' },
       { status: 500 }
     );
   }
 }
+
+// Validation schema for project creation
+const createProjectSchema = z.object({
+  name: z.string().min(1, 'Project name is required').max(200, 'Project name is too long'),
+  address: z.string().optional(),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
+  authority: z.string().min(1, 'Authority is required'),
+  zone: z.string().min(1, 'Zone is required'),
+  plotLength: z.number().positive('Plot length must be positive'),
+  plotWidth: z.number().positive('Plot width must be positive'),
+  plotArea: z.number().positive('Plot area must be positive'),
+  isCornerPlot: z.boolean().optional(),
+  roadWidthPrimary: z.number().positive('Primary road width must be positive'),
+  roadWidthSecondary: z.number().positive().optional(),
+  intendedUse: z.string().min(1, 'Intended use is required'),
+  heritage: z.boolean().optional(),
+  toz: z.boolean().optional(),
+  sez: z.boolean().optional(),
+});
 
 export async function POST(request: NextRequest) {
   try {
@@ -74,7 +95,19 @@ export async function POST(request: NextRequest) {
     }
     const userId = session.user.id;
 
-    const data = await request.json();
+    const body = await request.json();
+
+    // Validate input
+    const validation = createProjectSchema.safeParse(body);
+    if (!validation.success) {
+      const firstError = validation.error.issues[0];
+      return NextResponse.json(
+        { error: firstError?.message || 'Invalid input' },
+        { status: 400 }
+      );
+    }
+
+    const data = validation.data;
 
     const project = await prisma.project.create({
       data: {
@@ -103,7 +136,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Create project error:', error);
     return NextResponse.json(
-      { error: 'Failed to create project' },
+      { error: 'Failed to create project. Please check your input and try again.' },
       { status: 500 }
     );
   }

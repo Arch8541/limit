@@ -194,13 +194,18 @@ export function FileUploadWithAI({
             </div>
             <div>
               <p className="text-lg font-semibold text-gray-900">
-                {isDragActive ? 'Drop your drawing here' : 'Upload Drawing for AI Extraction'}
+                {isDragActive ? 'Drop your drawing here' : 'Upload Drawing'}
               </p>
               <p className="text-sm text-gray-600 mt-1">
                 or click to browse (PDF, DWG, JPG, PNG up to {formatFileSize(maxSize)})
               </p>
-              <p className="text-xs text-teal-600 mt-2 font-medium">
-                AI will automatically extract plot dimensions
+              <div className="flex items-center justify-center gap-2 mt-3">
+                <span className="px-3 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full border border-amber-300">
+                  AI EXTRACTION - COMING SOON
+                </span>
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                Manual dimension entry currently available
               </p>
             </div>
           </div>
@@ -250,20 +255,20 @@ export function FileUploadWithAI({
                   )}
 
                   {uploadedFile.status === 'extracting' && (
-                    <div className="mt-3 flex items-center gap-2 text-teal-600">
+                    <div className="mt-3 flex items-center gap-2 text-blue-600">
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span className="text-sm font-medium">AI is analyzing the drawing...</span>
+                      <span className="text-sm font-medium">Processing drawing...</span>
                     </div>
                   )}
 
                   {uploadedFile.status === 'verifying' && uploadedFile.extractedData && (
                     <div className="mt-4 space-y-4">
-                      <div className="flex items-start gap-2 text-amber-600 bg-amber-50 rounded-xl p-3">
+                      <div className="flex items-start gap-2 text-blue-600 bg-blue-50 rounded-xl p-3">
                         <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
                         <div className="text-sm">
-                          <p className="font-semibold">Please verify extracted dimensions</p>
-                          <p className="text-amber-700 mt-1">
-                            Confidence: {uploadedFile.extractedData.confidence.toFixed(1)}%
+                          <p className="font-semibold">Please enter plot dimensions</p>
+                          <p className="text-blue-700 mt-1">
+                            AI extraction feature coming soon - manual entry required
                           </p>
                         </div>
                       </div>
@@ -320,7 +325,7 @@ export function FileUploadWithAI({
                   {uploadedFile.status === 'success' && (
                     <div className="mt-3 flex items-center gap-2 text-emerald-600">
                       <CheckCircle2 className="w-5 h-5" />
-                      <span className="text-sm font-medium">Extraction complete</span>
+                      <span className="text-sm font-medium">Dimensions confirmed</span>
                     </div>
                   )}
 
