@@ -74,12 +74,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             return null;
           }
 
-          // Check if email is verified
-          if (!user.emailVerified) {
-            console.log('Email not verified for user:', credentials.email);
-            throw new Error('EMAIL_NOT_VERIFIED');
-          }
-
           console.log('Login successful for user:', user.email);
           return {
             id: user.id,
@@ -89,9 +83,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           };
         } catch (error) {
           console.error('Authorization error:', error);
-          if (error instanceof Error && error.message === 'EMAIL_NOT_VERIFIED') {
-            throw error;
-          }
           return null;
         }
       },
