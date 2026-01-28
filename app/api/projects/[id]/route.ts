@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import { auth } from '@/auth';
 import { dbProjectToAppProject } from '@/lib/db/converters';
+import { z } from 'zod';
 
 export async function GET(
   request: NextRequest,
@@ -39,11 +40,37 @@ export async function GET(
   } catch (error) {
     console.error('Get project error:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch project' },
+      { error: 'Failed to fetch project. Please try again later.' },
       { status: 500 }
     );
   }
 }
+
+// Validation schema for project update (all fields optional)
+const updateProjectSchema = z.object({
+  name: z.string().min(1).max(200).optional(),
+  address: z.string().optional(),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
+  authority: z.string().optional(),
+  zone: z.string().optional(),
+  plotLength: z.number().positive().optional(),
+  plotWidth: z.number().positive().optional(),
+  plotArea: z.number().positive().optional(),
+  isCornerPlot: z.boolean().optional(),
+  roadWidthPrimary: z.number().positive().optional(),
+  roadWidthSecondary: z.number().positive().optional(),
+  intendedUse: z.string().optional(),
+  heritage: z.boolean().optional(),
+  toz: z.boolean().optional(),
+  sez: z.boolean().optional(),
+  status: z.string().optional(),
+  reportId: z.string().optional(),
+  thumbnail: z.string().optional(),
+  regulationResult: z.any().optional(),
+  gdcrClauses: z.any().optional(),
+  extractedData: z.any().optional(),
+});
 
 export async function PUT(
   request: NextRequest,
@@ -57,7 +84,19 @@ export async function PUT(
     const userId = session.user.id;
 
     const { id } = await params;
-    const data = await request.json();
+    const body = await request.json();
+
+    // Validate input
+    const validation = updateProjectSchema.safeParse(body);
+    if (!validation.success) {
+      const firstError = validation.error.issues[0];
+      return NextResponse.json(
+        { error: firstError?.message || 'Invalid input' },
+        { status: 400 }
+      );
+    }
+
+    const data = validation.data;
 
     // Verify ownership
     const existingProject = await prisma.project.findFirst({
@@ -122,7 +161,7 @@ export async function PUT(
   } catch (error) {
     console.error('Update project error:', error);
     return NextResponse.json(
-      { error: 'Failed to update project' },
+      { error: 'Failed to update project. Please check your input and try again.' },
       { status: 500 }
     );
   }
@@ -161,7 +200,7 @@ export async function DELETE(
   } catch (error) {
     console.error('Delete project error:', error);
     return NextResponse.json(
-      { error: 'Failed to delete project' },
+      { error: 'Failed to delete project. Please try again later.' },
       { status: 500 }
     );
   }

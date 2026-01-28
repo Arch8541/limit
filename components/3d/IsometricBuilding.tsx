@@ -33,19 +33,20 @@ export function IsometricBuilding({
   // Calculate number of floors (assuming 3m per floor)
   const numFloors = Math.floor(buildingHeight / 3);
 
-  // SVG isometric projection constants
+  // SVG isometric projection constants (30-degree angle)
   const ISO_ANGLE = Math.PI / 6; // 30 degrees
-  const ISO_COS = Math.cos(ISO_ANGLE);
-  const ISO_SIN = Math.sin(ISO_ANGLE);
+  const ISO_COS = Math.cos(ISO_ANGLE); // √3/2 ≈ 0.866
+  const ISO_SIN = Math.sin(ISO_ANGLE); // 0.5
 
-  // Scale factor for visualization (fit within 600x500 view)
+  // Scale factor for visualization (fit within viewport)
   const maxDimension = Math.max(plotWidth, plotDepth);
-  const baseScale = Math.min(400 / maxDimension, 15);
+  const baseScale = Math.min(300 / maxDimension, 12);
 
-  // Isometric projection helper functions
+  // Isometric projection helper functions - true isometric projection
+  // For 30° isometric: x' = (x - y) * cos(30°), y' = (x + y) * sin(30°) - z
   const isoX = (x: number, y: number) => (x - y) * ISO_COS * baseScale;
   const isoY = (x: number, y: number, z: number) =>
-    (x + y) * ISO_SIN * baseScale - z * baseScale * 0.8;
+    (x + y) * ISO_SIN * baseScale - z * baseScale;
 
   // Calculate viewBox dimensions
   const viewWidth = 700;

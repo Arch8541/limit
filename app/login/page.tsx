@@ -19,9 +19,21 @@ function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Check if user just registered
-    if (searchParams.get('registered') === 'true') {
-      setSuccessMessage('Registration successful! Please login with your credentials.');
+    // Check for various query params
+    if (searchParams.get('verified') === 'true') {
+      setSuccessMessage('Email verified successfully! You can now login.');
+    } else if (searchParams.get('registered') === 'true') {
+      setSuccessMessage('Registration successful! Please check your email to verify your account.');
+    }
+
+    // Check for verification errors
+    const verifyError = searchParams.get('error');
+    if (verifyError === 'invalid_token') {
+      setError('Invalid or expired verification link. Please register again.');
+    } else if (verifyError === 'token_expired') {
+      setError('Verification link has expired. Please register again.');
+    } else if (verifyError === 'verification_failed') {
+      setError('Email verification failed. Please try again or contact support.');
     }
   }, [searchParams]);
 
@@ -38,7 +50,12 @@ function LoginForm() {
       });
 
       if (result?.error) {
-        setError('Invalid email or password');
+        // Check if the error is due to unverified email
+        if (result.error.includes('EMAIL_NOT_VERIFIED')) {
+          setError('Please verify your email address before logging in. Check your inbox for the verification link.');
+        } else {
+          setError('Invalid email or password');
+        }
       } else if (result?.ok) {
         router.push('/dashboard');
         router.refresh();

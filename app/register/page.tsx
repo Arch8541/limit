@@ -50,7 +50,7 @@ export default function RegisterPage() {
         return;
       }
 
-      // Registration successful - redirect to login page
+      // Registration successful - redirect to login page with message
       router.push('/login?registered=true');
     } catch (err) {
       console.error('Registration error:', err);
