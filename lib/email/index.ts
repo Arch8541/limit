@@ -2,7 +2,8 @@
 // Gracefully degrades if RESEND_API_KEY is not set
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const FROM_EMAIL = 'LIMIT Platform <noreply@limit.app>';
+// Use Resend's test email address if no custom domain is configured
+const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'LIMIT Platform <onboarding@resend.dev>';
 const NEXTAUTH_URL = process.env.NEXTAUTH_URL || 'http://localhost:3000';
 
 interface SendEmailOptions {
@@ -16,7 +17,8 @@ async function sendEmail({ to, subject, html }: SendEmailOptions): Promise<boole
     console.log('\n=== EMAIL (Development Mode - No RESEND_API_KEY) ===');
     console.log(`To: ${to}`);
     console.log(`Subject: ${subject}`);
-    console.log(`HTML: ${html.substring(0, 200)}...`);
+    console.log(`From: ${FROM_EMAIL}`);
+    console.log(`Verification URL: ${html.match(/https?:\/\/[^\s"]+/)?.[0] || 'N/A'}`);
     console.log('=== END EMAIL ===\n');
     return true;
   }
@@ -37,11 +39,17 @@ async function sendEmail({ to, subject, html }: SendEmailOptions): Promise<boole
     });
 
     if (!response.ok) {
-      const error = await response.text();
-      console.error('Resend API error:', error);
+      const errorText = await response.text();
+      console.error('Resend API error:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText,
+      });
       return false;
     }
 
+    const result = await response.json();
+    console.log('Email sent successfully:', { to, subject, id: result.id });
     return true;
   } catch (error) {
     console.error('Failed to send email:', error);
