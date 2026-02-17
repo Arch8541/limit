@@ -1,20 +1,18 @@
 -- CreateTable
 CREATE TABLE "User" (
-    "id" TEXT NOT NULL,
+    "id" TEXT NOT NULL PRIMARY KEY,
     "email" TEXT NOT NULL,
-    "emailVerified" TIMESTAMP(3),
+    "emailVerified" DATETIME,
     "name" TEXT,
     "password" TEXT,
     "image" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL
 );
 
 -- CreateTable
 CREATE TABLE "Account" (
-    "id" TEXT NOT NULL,
+    "id" TEXT NOT NULL PRIMARY KEY,
     "userId" TEXT NOT NULL,
     "type" TEXT NOT NULL,
     "provider" TEXT NOT NULL,
@@ -26,43 +24,42 @@ CREATE TABLE "Account" (
     "scope" TEXT,
     "id_token" TEXT,
     "session_state" TEXT,
-
-    CONSTRAINT "Account_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Account_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- CreateTable
 CREATE TABLE "Session" (
-    "id" TEXT NOT NULL,
+    "id" TEXT NOT NULL PRIMARY KEY,
     "sessionToken" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
-    "expires" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "Session_pkey" PRIMARY KEY ("id")
+    "expires" DATETIME NOT NULL,
+    CONSTRAINT "Session_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- CreateTable
 CREATE TABLE "VerificationToken" (
     "identifier" TEXT NOT NULL,
     "token" TEXT NOT NULL,
-    "expires" TIMESTAMP(3) NOT NULL
+    "expires" DATETIME NOT NULL
 );
 
 -- CreateTable
 CREATE TABLE "Project" (
-    "id" TEXT NOT NULL,
+    "id" TEXT NOT NULL PRIMARY KEY,
     "userId" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "address" TEXT,
-    "latitude" DOUBLE PRECISION,
-    "longitude" DOUBLE PRECISION,
+    "latitude" REAL,
+    "longitude" REAL,
     "authority" TEXT NOT NULL,
     "zone" TEXT NOT NULL,
-    "plotLength" DOUBLE PRECISION NOT NULL,
-    "plotWidth" DOUBLE PRECISION NOT NULL,
-    "plotArea" DOUBLE PRECISION NOT NULL,
+    "plotLength" REAL NOT NULL,
+    "plotWidth" REAL NOT NULL,
+    "plotArea" REAL NOT NULL,
+    "boundaryCoordinates" TEXT,
     "isCornerPlot" BOOLEAN NOT NULL DEFAULT false,
-    "roadWidthPrimary" DOUBLE PRECISION NOT NULL,
-    "roadWidthSecondary" DOUBLE PRECISION,
+    "roadWidthPrimary" REAL NOT NULL,
+    "roadWidthSecondary" REAL,
     "intendedUse" TEXT NOT NULL,
     "heritage" BOOLEAN NOT NULL DEFAULT false,
     "toz" BOOLEAN NOT NULL DEFAULT false,
@@ -73,10 +70,9 @@ CREATE TABLE "Project" (
     "reportId" TEXT,
     "status" TEXT NOT NULL DEFAULT 'draft',
     "thumbnail" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "Project_pkey" PRIMARY KEY ("id")
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "Project_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- CreateIndex
@@ -105,12 +101,3 @@ CREATE INDEX "Project_userId_idx" ON "Project"("userId");
 
 -- CreateIndex
 CREATE INDEX "Project_status_idx" ON "Project"("status");
-
--- AddForeignKey
-ALTER TABLE "Account" ADD CONSTRAINT "Account_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Session" ADD CONSTRAINT "Session_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Project" ADD CONSTRAINT "Project_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

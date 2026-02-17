@@ -31,6 +31,7 @@ export async function GET(
     // Parse JSON fields and convert to app format
     const parsed = {
       ...project,
+      boundaryCoordinates: project.boundaryCoordinates ? JSON.parse(project.boundaryCoordinates) : null,
       regulationResult: project.regulationResult ? JSON.parse(project.regulationResult) : null,
       gdcrClauses: project.gdcrClauses ? JSON.parse(project.gdcrClauses) : [],
       extractedData: project.extractedData ? JSON.parse(project.extractedData) : null,
@@ -57,6 +58,10 @@ const updateProjectSchema = z.object({
   plotLength: z.number().positive().optional(),
   plotWidth: z.number().positive().optional(),
   plotArea: z.number().positive().optional(),
+  boundaryCoordinates: z.array(z.object({
+    x: z.number(),
+    y: z.number()
+  })).optional(),
   isCornerPlot: z.boolean().optional(),
   roadWidthPrimary: z.number().positive().optional(),
   roadWidthSecondary: z.number().positive().optional(),
@@ -134,6 +139,9 @@ export async function PUT(
     if (data.thumbnail !== undefined) updateData.thumbnail = data.thumbnail;
 
     // Handle JSON fields
+    if (data.boundaryCoordinates !== undefined) {
+      updateData.boundaryCoordinates = data.boundaryCoordinates ? JSON.stringify(data.boundaryCoordinates) : null;
+    }
     if (data.regulationResult !== undefined) {
       updateData.regulationResult = JSON.stringify(data.regulationResult);
     }
@@ -152,6 +160,7 @@ export async function PUT(
     // Parse JSON fields for response and convert to app format
     const parsed = {
       ...project,
+      boundaryCoordinates: project.boundaryCoordinates ? JSON.parse(project.boundaryCoordinates) : null,
       regulationResult: project.regulationResult ? JSON.parse(project.regulationResult) : null,
       gdcrClauses: project.gdcrClauses ? JSON.parse(project.gdcrClauses) : [],
       extractedData: project.extractedData ? JSON.parse(project.extractedData) : null,

@@ -10,6 +10,10 @@ import { Badge } from '@/components/ui/Badge';
 import { IsometricBuilding } from '@/components/3d/IsometricBuilding';
 import { ApplicableNorms } from '@/components/norms/ApplicableNorms';
 import { InfoTooltip } from '@/components/ui/Tooltip';
+import { FSIAdjuster } from '@/components/ui/FSIAdjuster';
+import { SetbackAdjuster } from '@/components/ui/SetbackAdjuster';
+import { ParkingAreaCalculator } from '@/components/ui/ParkingAreaCalculator';
+import gdcrRules from '@/lib/regulations/gdcr-2017.json';
 import {
   Building2,
   ArrowLeft,
@@ -21,6 +25,7 @@ import {
   Flame,
   Accessibility,
   Download,
+  Settings2,
 } from 'lucide-react';
 
 export default function ProjectDetailPage() {
@@ -30,6 +35,12 @@ export default function ProjectDetailPage() {
   const [mounted, setMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [navigatingTo, setNavigatingTo] = useState<string | null>(null);
+
+  // Adjusted values
+  const [adjustedFSI, setAdjustedFSI] = useState<number | null>(null);
+  const [adjustedBuiltUpArea, setAdjustedBuiltUpArea] = useState<number | null>(null);
+  const [adjustedSetbacks, setAdjustedSetbacks] = useState<{ front: number; side: number; rear: number } | null>(null);
+  const [parkingAllocation, setParkingAllocation] = useState<any>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -81,6 +92,14 @@ export default function ProjectDetailPage() {
   }
 
   const { siteData, regulationResult, gdcrClauses, reportId, status } = project;
+
+  // Get zone rules for FSI limits
+  const zoneRules = regulationResult ? gdcrRules.zones[siteData.zone] : null;
+
+  // Calculate effective values (adjusted or original)
+  const effectiveFSI = adjustedFSI ?? regulationResult?.fsi.total;
+  const effectiveBuiltUpArea = adjustedBuiltUpArea ?? regulationResult?.fsi.maxBuiltUpArea;
+  const effectiveSetbacks = adjustedSetbacks ?? regulationResult?.setbacks;
 
   return (
     <div className="min-h-screen gradient-mesh">
@@ -185,12 +204,12 @@ export default function ProjectDetailPage() {
             plotDepth={siteData.plotDimensions.length}
             buildingHeight={regulationResult.height.max}
             setbacks={{
-              front: regulationResult.setbacks.front,
-              rear: regulationResult.setbacks.rear,
-              side: regulationResult.setbacks.side,
+              front: effectiveSetbacks?.front ?? regulationResult.setbacks.front,
+              rear: effectiveSetbacks?.rear ?? regulationResult.setbacks.rear,
+              side: effectiveSetbacks?.side ?? regulationResult.setbacks.side,
             }}
             groundCoverage={regulationResult.groundCoverage.maxPercentage}
-            fsiUtilization={(regulationResult.fsi.total / (regulationResult.fsi.base + regulationResult.fsi.premium)) * 100}
+            fsiUtilization={effectiveFSI !== undefined && zoneRules ? (effectiveFSI / zoneRules.maxFSI) * 100 : (regulationResult.fsi.total / (regulationResult.fsi.base + regulationResult.fsi.premium)) * 100}
             className="mb-8"
           />
         )}
@@ -198,13 +217,19 @@ export default function ProjectDetailPage() {
         {/* Regulation Results */}
         {regulationResult && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* FSI Card */}
+            {/* FSI Card with Adjuster */}
             <Card glass className="border border-slate-200/60">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3 text-2xl">
                   <Layers className="w-6 h-6 text-cyan-600" />
                   Floor Space Index (FSI)
                   <InfoTooltip content="FSI is the ratio of total built-up area to the plot area. It determines how much floor area can be constructed on a given plot." />
+                  {adjustedFSI !== null && (
+                    <Badge variant="warning" className="ml-auto text-xs">
+                      <Settings2 className="w-3 h-3 mr-1" />
+                      Adjusted
+                    </Badge>
+                  )}
                 </CardTitle>
                 <CardDescription className="text-sm font-medium">
                   {gdcrClauses.find((c) => c.category === 'FSI')?.clauseNumber}
@@ -212,6 +237,7 @@ export default function ProjectDetailPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
+                  {/* Calculated Values */}
                   <div className="grid grid-cols-2 gap-4">
                     <div className="p-4 bg-slate-50/80 rounded-xl">
                       <p className="text-sm text-slate-600 font-semibold mb-2">Base FSI</p>
@@ -226,19 +252,42 @@ export default function ProjectDetailPage() {
                       </p>
                     </div>
                     <div className="p-4 bg-emerald-50/80 rounded-xl border border-emerald-200/60">
-                      <p className="text-sm text-emerald-700 font-semibold mb-2">Total FSI</p>
+                      <p className="text-sm text-emerald-700 font-semibold mb-2">
+                        {adjustedFSI !== null ? 'Calculated FSI' : 'Total FSI'}
+                      </p>
                       <p className="text-3xl font-extrabold text-emerald-700">
                         {regulationResult.fsi.total.toFixed(2)}
                       </p>
                     </div>
                     <div className="p-4 bg-indigo-50/80 rounded-xl border border-indigo-200/60">
-                      <p className="text-sm text-indigo-700 font-semibold mb-2">Max Built-up</p>
+                      <p className="text-sm text-indigo-700 font-semibold mb-2">
+                        {adjustedBuiltUpArea !== null ? 'Calculated Area' : 'Max Built-up'}
+                      </p>
                       <p className="text-3xl font-extrabold text-indigo-700">
                         {regulationResult.fsi.maxBuiltUpArea.toFixed(0)}
                       </p>
                       <p className="text-xs text-indigo-600 font-medium mt-1">sq.m</p>
                     </div>
                   </div>
+
+                  {/* FSI Adjuster */}
+                  <div className="p-6 bg-gradient-to-br from-cyan-50 to-indigo-50 rounded-2xl border-2 border-cyan-200/60">
+                    <h4 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                      <Settings2 className="w-5 h-5 text-cyan-600" />
+                      Adjust FSI
+                    </h4>
+                    <FSIAdjuster
+                      baseFSI={regulationResult.fsi.base}
+                      currentFSI={regulationResult.fsi.total}
+                      maxFSI={zoneRules?.maxFSI || regulationResult.fsi.total}
+                      plotArea={siteData.plotDimensions.area}
+                      onChange={(newFSI, newBuiltUpArea) => {
+                        setAdjustedFSI(newFSI);
+                        setAdjustedBuiltUpArea(newBuiltUpArea);
+                      }}
+                    />
+                  </div>
+
                   <div className="p-4 bg-slate-50/80 rounded-xl text-sm text-slate-700 whitespace-pre-line font-mono leading-relaxed">
                     {regulationResult.fsi.calculation}
                   </div>
@@ -284,41 +333,70 @@ export default function ProjectDetailPage() {
               </CardContent>
             </Card>
 
-            {/* Setbacks Card */}
-            <Card>
+            {/* Setbacks Card with Adjuster */}
+            <Card glass className="border border-slate-200/60">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Building2 className="w-5 h-5 text-blue-600" />
+                <CardTitle className="flex items-center gap-3 text-2xl">
+                  <Building2 className="w-6 h-6 text-indigo-600" />
                   Setbacks
                   <InfoTooltip content="Setbacks are the mandatory open spaces that must be left between the building and the plot boundaries for light, ventilation, and fire safety." />
+                  {adjustedSetbacks !== null && (
+                    <Badge variant="warning" className="ml-auto text-xs">
+                      <Settings2 className="w-3 h-3 mr-1" />
+                      Adjusted
+                    </Badge>
+                  )}
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-sm font-medium">
                   {gdcrClauses.find((c) => c.category === 'Setbacks')?.clauseNumber}
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-3 gap-3">
-                    <div>
-                      <p className="text-sm text-gray-600">Front</p>
-                      <p className="text-2xl font-bold text-gray-900">
+                <div className="space-y-6">
+                  {/* Calculated Values */}
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="p-4 bg-indigo-50/80 rounded-xl border border-indigo-200/60">
+                      <p className="text-sm text-indigo-700 font-semibold mb-2">
+                        {adjustedSetbacks !== null ? 'Min Front' : 'Front'}
+                      </p>
+                      <p className="text-3xl font-extrabold text-indigo-700">
                         {regulationResult.setbacks.front}m
                       </p>
                     </div>
-                    <div>
-                      <p className="text-sm text-gray-600">Side</p>
-                      <p className="text-2xl font-bold text-gray-900">
+                    <div className="p-4 bg-cyan-50/80 rounded-xl border border-cyan-200/60">
+                      <p className="text-sm text-cyan-700 font-semibold mb-2">
+                        {adjustedSetbacks !== null ? 'Min Side' : 'Side'}
+                      </p>
+                      <p className="text-3xl font-extrabold text-cyan-700">
                         {regulationResult.setbacks.side}m
                       </p>
                     </div>
-                    <div>
-                      <p className="text-sm text-gray-600">Rear</p>
-                      <p className="text-2xl font-bold text-gray-900">
+                    <div className="p-4 bg-emerald-50/80 rounded-xl border border-emerald-200/60">
+                      <p className="text-sm text-emerald-700 font-semibold mb-2">
+                        {adjustedSetbacks !== null ? 'Min Rear' : 'Rear'}
+                      </p>
+                      <p className="text-3xl font-extrabold text-emerald-700">
                         {regulationResult.setbacks.rear}m
                       </p>
                     </div>
                   </div>
-                  <div className="p-3 bg-gray-50 rounded-lg text-xs text-gray-700 whitespace-pre-line font-mono">
+
+                  {/* Setback Adjuster */}
+                  <div className="p-6 bg-gradient-to-br from-indigo-50 to-cyan-50 rounded-2xl border-2 border-indigo-200/60">
+                    <h4 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                      <Settings2 className="w-5 h-5 text-indigo-600" />
+                      Adjust Setbacks
+                    </h4>
+                    <SetbackAdjuster
+                      currentSetbacks={regulationResult.setbacks}
+                      minimumSetbacks={regulationResult.setbacks}
+                      onChange={(newSetbacks) => {
+                        setAdjustedSetbacks(newSetbacks);
+                      }}
+                    />
+                  </div>
+
+                  <div className="p-4 bg-slate-50/80 rounded-xl text-sm text-slate-700 whitespace-pre-line font-mono leading-relaxed">
                     {regulationResult.setbacks.calculations}
                   </div>
                 </div>
@@ -326,74 +404,96 @@ export default function ProjectDetailPage() {
             </Card>
 
             {/* Ground Coverage Card */}
-            <Card>
+            <Card glass className="border border-slate-200/60">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Layers className="w-5 h-5 text-blue-600" />
+                <CardTitle className="flex items-center gap-3 text-2xl">
+                  <Layers className="w-6 h-6 text-emerald-600" />
                   Ground Coverage
                   <InfoTooltip content="Ground Coverage is the percentage of the plot area that can be covered by the building footprint at ground level." />
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-sm font-medium">
                   {gdcrClauses.find((c) => c.category === 'Ground Coverage')?.clauseNumber}
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <p className="text-sm text-gray-600">Maximum %</p>
-                      <p className="text-3xl font-bold text-blue-600">
+                <div className="space-y-6">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-4 bg-emerald-50/80 rounded-xl border border-emerald-200/60">
+                      <p className="text-sm text-emerald-700 font-semibold mb-2">Maximum %</p>
+                      <p className="text-3xl font-extrabold text-emerald-700">
                         {regulationResult.groundCoverage.maxPercentage}%
                       </p>
                     </div>
-                    <div>
-                      <p className="text-sm text-gray-600">Max Area</p>
-                      <p className="text-3xl font-bold text-gray-900">
+                    <div className="p-4 bg-slate-50/80 rounded-xl">
+                      <p className="text-sm text-slate-600 font-semibold mb-2">Max Area</p>
+                      <p className="text-3xl font-bold text-slate-900">
                         {regulationResult.groundCoverage.maxArea.toFixed(0)}
                       </p>
-                      <p className="text-xs text-gray-500">sq.m</p>
+                      <p className="text-xs text-slate-500 mt-1">sq.m</p>
                     </div>
                   </div>
-                  <div className="p-3 bg-gray-50 rounded-lg text-xs text-gray-700 whitespace-pre-line font-mono">
+                  <div className="p-4 bg-slate-50/80 rounded-xl text-sm text-slate-700 whitespace-pre-line font-mono leading-relaxed">
                     {regulationResult.groundCoverage.calculation}
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Parking Card */}
-            <Card>
+            {/* Parking Card with Area Calculator */}
+            <Card glass className="border border-slate-200/60 lg:col-span-2">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Car className="w-5 h-5 text-blue-600" />
+                <CardTitle className="flex items-center gap-3 text-2xl">
+                  <Car className="w-6 h-6 text-indigo-600" />
                   Parking Requirements
                   <InfoTooltip content="Parking requirements specify the minimum number of parking spaces needed based on the building use and area." />
+                  {parkingAllocation !== null && (
+                    <Badge variant="warning" className="ml-auto text-xs">
+                      <Settings2 className="w-3 h-3 mr-1" />
+                      Custom Allocation
+                    </Badge>
+                  )}
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-sm font-medium">
                   {gdcrClauses.find((c) => c.category === 'Parking')?.clauseNumber}
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <p className="text-sm text-gray-600 flex items-center gap-1">
+                <div className="space-y-6">
+                  {/* Calculated ECS Values */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-4 bg-indigo-50/80 rounded-xl border border-indigo-200/60">
+                      <p className="text-sm text-indigo-700 font-semibold mb-2 flex items-center gap-1">
                         Required ECS
                         <InfoTooltip content="ECS (Equivalent Car Space) is the standard unit for measuring parking requirements. One ECS typically measures 2.5m × 5m." position="right" />
                       </p>
-                      <p className="text-3xl font-bold text-blue-600">
+                      <p className="text-3xl font-extrabold text-indigo-700">
                         {regulationResult.parking.required}
                       </p>
                     </div>
-                    <div>
-                      <p className="text-sm text-gray-600">Area Required</p>
-                      <p className="text-3xl font-bold text-gray-900">
+                    <div className="p-4 bg-cyan-50/80 rounded-xl border border-cyan-200/60">
+                      <p className="text-sm text-cyan-700 font-semibold mb-2">Total Area Required</p>
+                      <p className="text-3xl font-extrabold text-cyan-700">
                         {regulationResult.parking.areaRequired.toFixed(0)}
                       </p>
-                      <p className="text-xs text-gray-500">sq.m</p>
+                      <p className="text-xs text-cyan-600 font-medium mt-1">sq.m</p>
                     </div>
                   </div>
-                  <div className="p-3 bg-gray-50 rounded-lg text-xs text-gray-700 whitespace-pre-line font-mono">
+
+                  {/* Parking Area Calculator */}
+                  <div className="p-6 bg-gradient-to-br from-indigo-50 to-cyan-50 rounded-2xl border-2 border-indigo-200/60">
+                    <h4 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                      <Settings2 className="w-5 h-5 text-indigo-600" />
+                      Parking Space Allocation
+                    </h4>
+                    <ParkingAreaCalculator
+                      totalParkingArea={regulationResult.parking.areaRequired}
+                      onAllocationChange={(allocation) => {
+                        setParkingAllocation(allocation);
+                      }}
+                    />
+                  </div>
+
+                  <div className="p-4 bg-slate-50/80 rounded-xl text-sm text-slate-700 whitespace-pre-line font-mono leading-relaxed">
                     {regulationResult.parking.calculation}
                   </div>
                 </div>
@@ -401,22 +501,22 @@ export default function ProjectDetailPage() {
             </Card>
 
             {/* Fire Safety Card */}
-            <Card>
+            <Card glass className="border border-slate-200/60">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Flame className="w-5 h-5 text-orange-600" />
+                <CardTitle className="flex items-center gap-3 text-2xl">
+                  <Flame className="w-6 h-6 text-orange-600" />
                   Fire Safety
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-sm font-medium">
                   {gdcrClauses.find((c) => c.category === 'Fire Safety')?.clauseNumber}
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <Badge className={regulationResult.fireSafety.required ? 'bg-orange-100 text-orange-700 border-orange-200' : 'bg-green-100 text-green-700 border-green-200'}>
                     {regulationResult.fireSafety.required ? 'Required' : 'Basic Requirements'}
                   </Badge>
-                  <ul className="space-y-2 text-sm text-gray-700">
+                  <ul className="space-y-2 text-sm text-slate-700">
                     {regulationResult.fireSafety.requirements.map((req, idx) => (
                       <li key={idx} className="flex items-start gap-2">
                         <span className="text-orange-600 mt-1">•</span>

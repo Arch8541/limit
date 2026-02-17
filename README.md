@@ -4,98 +4,42 @@ Professional SaaS platform for GDCR 2017 (Gujarat Development Control Regulation
 
 ## Overview
 
-LIMIT helps architects, developers, and investors quickly analyze building regulations for construction projects in Ahmedabad. The platform calculates FSI, height limits, setbacks, parking requirements, and other GDCR 2017 parameters automatically.
+LIMIT helps architects, developers, and investors analyze building regulations for construction projects in Ahmedabad. The platform calculates FSI, height limits, setbacks, parking requirements, and other GDCR 2017 parameters automatically.
 
 ## Features
 
-### Core Functionality
 - **Project Management**: Create, view, edit, and delete building regulation projects
 - **GDCR 2017 Compliance**: Automated calculation of all major regulatory parameters
-- **Professional Reports**: Print-ready PDF reports with calculations and disclaimers
-- **Bulk Analysis**: CSV template for processing multiple sites simultaneously
-- **Search & Filter**: Quick search across all projects by name, address, or zone
-
-### Calculations Provided
-1. **FSI (Floor Space Index)**
-   - Base FSI by zone
-   - Premium FSI based on road width
-   - Corner plot bonus
-   - Maximum built-up area calculation
-
-2. **Building Height**
-   - Formula: 2 × (Road Width + Front Setback)
-   - Zone-specific maximum limits
-   - Transparent calculation display
-
-3. **Setbacks**
-   - Front setback (based on road width)
-   - Side setback (based on building height)
-   - Rear setback (zone-specific)
-
-4. **Ground Coverage**
-   - Maximum percentage by zone
-   - Maximum ground floor area
-
-5. **Parking Requirements**
-   - ECS (Equivalent Car Space) calculation
-   - Use-type specific requirements
-   - Total area required
-
-6. **Fire Safety**
-   - Height-based requirements
-   - Mandatory installations list
-
-7. **Accessibility**
-   - Ramp requirements
-   - Lift requirements (height-based)
-   - Universal access standards
-
-8. **Structural Specifications**
-   - Plinth height
-   - Floor-to-floor height
-   - Parapet specifications
+- **Interactive Map Drawing**: Draw plot boundaries using Leaflet and Leaflet Draw
+- **3D Visualization**: Interactive 3D building visualization
+- **Professional PDF Reports**: Generate detailed PDF reports
+- **Bulk Analysis**: Process multiple sites simultaneously
+- **Comparative Analysis**: Compare multiple projects side-by-side
+- **User Authentication**: Secure login/register with NextAuth v5
 
 ## Tech Stack
 
-- **Framework**: Next.js 15 (App Router)
-- **Language**: TypeScript
+- **Framework**: Next.js 16 (App Router), TypeScript
 - **Styling**: Tailwind CSS v4
-- **Authentication**: JWT with bcryptjs
-- **Storage**: localStorage (MVP)
-- **Icons**: Lucide React
-- **PDF Generation**: Browser print-to-PDF
+- **Authentication**: NextAuth v5 with Prisma Adapter
+- **Database**: Prisma ORM (SQLite dev / PostgreSQL production)
+- **Maps**: Leaflet with React-Leaflet
+- **Forms**: React Hook Form with Zod validation
+- **PDF**: @react-pdf/renderer
+- **Email**: React Email with Resend
 
 ## Project Structure
 
 ```
-D:/limit/
-├── app/                          # Next.js app router pages
-│   ├── page.tsx                 # Landing page
-│   ├── login/page.tsx           # Login page
-│   ├── register/page.tsx        # Registration page
-│   ├── dashboard/page.tsx       # Project list dashboard
-│   ├── projects/
-│   │   ├── new/page.tsx         # Project creation wizard
-│   │   └── [id]/
-│   │       ├── page.tsx         # Project detail view
-│   │       └── report/page.tsx  # Printable PDF report
-│   └── bulk-analysis/page.tsx   # CSV bulk upload
-├── components/
-│   └── ui/                      # Reusable UI components
-│       ├── Button.tsx
-│       ├── Card.tsx
-│       ├── Input.tsx
-│       ├── Select.tsx
-│       ├── Badge.tsx
-│       └── Tooltip.tsx
-├── lib/
-│   ├── auth/                    # Authentication utilities
-│   ├── calculations/            # Regulation calculation engine
-│   ├── regulations/             # GDCR 2017 rules database (JSON)
-│   └── storage/                 # LocalStorage utilities
-├── types/
-│   └── index.ts                 # TypeScript type definitions
-└── CLAUDE.md                    # Development tracking
+limit/
+├── app/                    # Next.js App Router (pages, API routes)
+├── components/             # UI components (ui, 3d, dashboard, forms, etc.)
+├── lib/                    # Business logic (auth, calculations, regulations, db, etc.)
+├── prisma/                 # Database schema and migrations
+├── types/                  # TypeScript type definitions
+├── auth.ts                 # NextAuth configuration
+├── middleware.ts           # Route protection
+└── package.json            # Dependencies
 ```
 
 ## Getting Started
@@ -107,91 +51,93 @@ D:/limit/
 ### Installation
 
 ```bash
-# Clone the repository
+# Clone and install
 git clone <repository-url>
 cd limit
-
-# Install dependencies
 npm install
+
+# Setup environment
+cp .env.example .env
+# Edit .env with your configuration
+
+# Setup database
+npx prisma generate
+npx prisma migrate dev
 
 # Run development server
 npm run dev
-
-# Build for production
-npm run build
-
-# Start production server
-npm start
 ```
 
-### First Run
+Open [http://localhost:3000](http://localhost:3000)
 
-1. Navigate to `http://localhost:3000`
-2. Click "Get Started" or "Register"
-3. Create an account with email/password
-4. Login to access the dashboard
-5. Create your first project using "New Project"
+### Environment Variables
 
-## Usage Guide
+```env
+# Required
+DATABASE_URL="file:./dev.db"                    # SQLite for dev
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="<generate-with-openssl>"       # openssl rand -base64 32
+JWT_SECRET="<generate-with-openssl>"
+
+# Optional
+GOOGLE_CLIENT_ID=""
+GOOGLE_CLIENT_SECRET=""
+RESEND_API_KEY=""
+```
+
+### Production Deployment
+
+For Vercel:
+1. Set environment variables in Vercel dashboard
+2. Use PostgreSQL for `DATABASE_URL`
+3. Deploy via GitHub or `vercel` CLI
+4. Run `npx prisma migrate deploy`
+
+## Usage
 
 ### Creating a Project
-
 1. Click "New Project" from dashboard
-2. Fill in site information:
-   - Project name and address
-   - Location coordinates (lat/lng)
-   - Authority (AUDA/AMC) and Zone
-   - Plot dimensions (length × width)
-   - Road width(s)
-   - Intended use type
-   - Special conditions (if any)
-3. Click "Calculate Regulations"
-4. View detailed results with calculations
+2. Fill in site information (name, address, zone, authority)
+3. Define plot dimensions:
+   - Manual entry (length, width, area)
+   - Interactive map drawing (recommended)
+4. Enter road width(s) and special conditions
+5. Click "Calculate Regulations"
+6. View results and generate PDF report
 
-### Viewing Reports
-
-1. Open any completed project
-2. Click "View Report"
-3. Review all calculations and clauses
-4. Click "Print / Save PDF" to generate PDF
-5. Use browser's print dialog to save
-
-### Bulk Analysis
-
-1. Click "Bulk Analysis" from dashboard
-2. Download CSV template
-3. Fill in multiple site details
-4. Upload completed CSV file
-5. Process all sites simultaneously
-6. Download comparative reports
-
-## Important Disclaimers
-
-**This is an advisory tool only.** All calculations and recommendations must be verified with the local development authority (AUDA/AMC) before proceeding with construction.
-
-- No liability assumed for decisions based on reports
-- Not a substitute for professional architectural/engineering consultation
-- Regulations subject to amendments and updates
-- Always verify current GDCR version applies
+### Key Calculations
+- **FSI**: Base FSI, Premium FSI, corner plot bonus
+- **Height**: Formula-based with zone limits
+- **Setbacks**: Front, side, and rear setbacks
+- **Ground Coverage**: Zone-specific percentages
+- **Parking**: ECS calculation by use type
+- **Fire Safety**: Height-based requirements
+- **Accessibility**: Ramps and lift requirements
 
 ## Development
 
-### Building
+### Available Commands
+
 ```bash
-npm run build
+npm run dev              # Start dev server
+npm run build            # Production build
+npm run lint             # Run ESLint
+
+npx prisma studio        # Database GUI
+npx prisma migrate dev   # Create migration
+npx prisma format        # Format schema
 ```
 
-### Linting
-```bash
-npm run lint
-```
+### Architecture
 
-### Type Checking
-TypeScript compilation happens automatically during build.
+- **Authentication**: NextAuth v5 with JWT and Prisma
+- **Database**: Prisma ORM with type-safe queries
+- **API**: Next.js API routes with validation
+- **Forms**: React Hook Form + Zod schemas
+- **State**: React hooks and URL parameters
 
 ## GDCR 2017 Coverage
 
-The platform implements regulations from:
 - Clause 7.2 - Floor Space Index
 - Clause 7.3 - Building Height
 - Clause 7.4 - Setback Requirements
@@ -203,43 +149,37 @@ The platform implements regulations from:
 
 ## Supported Zones
 
-- **R1**: Residential Zone 1
-- **R2**: Residential Zone 2
-- **Commercial**: Commercial Zone
-- **Industrial**: Industrial Zone
-- **Mixed-Use**: Mixed-Use Development
+- R1, R2 (Residential)
+- Commercial
+- Industrial
+- Mixed-Use
 
-## Authorities Supported
+## Authorities
 
-- **AUDA**: Ahmedabad Urban Development Authority
-- **AMC**: Ahmedabad Municipal Corporation
+- AUDA (Ahmedabad Urban Development Authority)
+- AMC (Ahmedabad Municipal Corporation)
 
-## Future Enhancements
+## Security
 
-Potential features for future versions:
-- Interactive map with plot visualization (Leaflet)
-- Drawing file upload (DWG/PDF/JPG)
-- AI-powered dimension extraction
-- Real CSV parsing for bulk analysis
-- Excel export with formulas
-- Project comparison charts
-- User collaboration/sharing
-- Email notifications
-- Multi-language support (Gujarati)
+### Production Checklist
+- [ ] Set secure `NEXTAUTH_SECRET` and `JWT_SECRET`
+- [ ] Use PostgreSQL (not SQLite)
+- [ ] Enable HTTPS (automatic on Vercel)
+- [ ] Never commit secrets to git
+- [ ] Run `npm audit` regularly
 
-## License
+## Important Disclaimer
 
-This project is for educational and advisory purposes only.
+**This is an advisory tool only.** All calculations must be verified with local authorities (AUDA/AMC) before construction. No liability is assumed for decisions based on these reports. Always consult licensed professionals.
 
-## Contact
+## Support
 
-For questions or support regarding GDCR 2017 regulations, consult with:
-- Local authority (AUDA/AMC)
-- Licensed architect
-- Structural engineer
-- Legal advisor
+- **Technical Issues**: Check `docs/` folder or open GitHub issue
+- **GDCR Compliance**: Consult AUDA/AMC or licensed architect
+- **Documentation**: See `CLAUDE.md`, `UI_DESIGN_GUIDE.md`
 
 ---
 
-**Generated by LIMIT Platform**
-*Building Compliance Made Simple*
+**LIMIT Platform** - Building Regulation Compliance Made Simple
+
+*Built with Next.js 16, TypeScript, Prisma, and NextAuth v5*

@@ -15,6 +15,7 @@ export function dbProjectToAppProject(dbProject: any): Project {
       length: dbProject.plotLength,
       width: dbProject.plotWidth,
       area: dbProject.plotArea,
+      boundaryCoordinates: dbProject.boundaryCoordinates || undefined,
     },
     isCornerPlot: dbProject.isCornerPlot,
     roadWidthPrimary: dbProject.roadWidthPrimary,

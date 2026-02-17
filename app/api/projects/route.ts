@@ -28,6 +28,7 @@ export async function GET(request: NextRequest) {
         plotLength: true,
         plotWidth: true,
         plotArea: true,
+        boundaryCoordinates: true,
         isCornerPlot: true,
         roadWidthPrimary: true,
         roadWidthSecondary: true,
@@ -50,6 +51,7 @@ export async function GET(request: NextRequest) {
     const projectsWithParsedData = dbProjects.map(project => {
       const parsed = {
         ...project,
+        boundaryCoordinates: project.boundaryCoordinates ? JSON.parse(project.boundaryCoordinates) : null,
         regulationResult: project.regulationResult ? JSON.parse(project.regulationResult) : null,
         gdcrClauses: project.gdcrClauses ? JSON.parse(project.gdcrClauses) : [],
         extractedData: project.extractedData ? JSON.parse(project.extractedData) : null,
@@ -78,6 +80,10 @@ const createProjectSchema = z.object({
   plotLength: z.number().positive('Plot length must be positive'),
   plotWidth: z.number().positive('Plot width must be positive'),
   plotArea: z.number().positive('Plot area must be positive'),
+  boundaryCoordinates: z.array(z.object({
+    x: z.number(),
+    y: z.number()
+  })).optional(),
   isCornerPlot: z.boolean().optional(),
   roadWidthPrimary: z.number().positive('Primary road width must be positive'),
   roadWidthSecondary: z.number().positive().optional(),
@@ -121,6 +127,7 @@ export async function POST(request: NextRequest) {
         plotLength: data.plotLength,
         plotWidth: data.plotWidth,
         plotArea: data.plotArea,
+        boundaryCoordinates: data.boundaryCoordinates ? JSON.stringify(data.boundaryCoordinates) : null,
         isCornerPlot: data.isCornerPlot || false,
         roadWidthPrimary: data.roadWidthPrimary,
         roadWidthSecondary: data.roadWidthSecondary,

@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
 import { MapPicker } from '@/components/ui/MapPicker';
+import { MapPolygonPicker } from '@/components/ui/MapPolygonPicker';
 import { FileUpload } from '@/components/ui/FileUpload';
 import { Building2, ArrowLeft, Save, Calculator } from 'lucide-react';
 
@@ -29,8 +30,22 @@ export default function NewProjectPage() {
   const [location, setLocation] = useState<{ lat: number; lng: number; address?: string }>({ lat: 23.0225, lng: 72.5714, address: '' });
   const [authority, setAuthority] = useState<Authority>('AUDA');
   const [zone, setZone] = useState<Zone>('R1');
+
+  // Plot type state - new
+  const [plotType, setPlotType] = useState<'rectangular' | 'irregular'>('rectangular');
+
+  // Rectangular plot state
   const [plotLength, setPlotLength] = useState('');
   const [plotWidth, setPlotWidth] = useState('');
+
+  // Irregular plot state - new
+  const [siteBoundary, setSiteBoundary] = useState<{
+    center: { lat: number; lng: number };
+    polygon: { lat: number; lng: number }[];
+    area: number;
+    perimeter: number;
+  } | null>(null);
+
   const [isCornerPlot, setIsCornerPlot] = useState(false);
   const [roadWidthPrimary, setRoadWidthPrimary] = useState('');
   const [roadWidthSecondary, setRoadWidthSecondary] = useState('');
@@ -48,9 +63,38 @@ export default function NewProjectPage() {
         return;
       }
 
-      const length = parseFloat(plotLength);
-      const width = parseFloat(plotWidth);
-      const area = length * width;
+      let length: number;
+      let width: number;
+      let area: number;
+      let boundaryCoordinates: Array<{ x: number; y: number }> | undefined;
+
+      if (plotType === 'rectangular') {
+        // Rectangular plot
+        length = parseFloat(plotLength);
+        width = parseFloat(plotWidth);
+        area = length * width;
+      } else {
+        // Irregular plot from polygon
+        if (!siteBoundary) {
+          alert('Please draw the site boundary on the map');
+          setIsLoading(false);
+          return;
+        }
+
+        area = siteBoundary.area;
+        // Use perimeter as approximation for length+width for rectangular calculations
+        const perimeter = siteBoundary.perimeter;
+        // Approximate as square for regulation calculations
+        const side = Math.sqrt(area);
+        length = side;
+        width = side;
+
+        // Store polygon coordinates
+        boundaryCoordinates = siteBoundary.polygon.map(coord => ({
+          x: coord.lng,
+          y: coord.lat,
+        }));
+      }
 
       const siteData: SiteData = {
         projectName,
@@ -65,6 +109,7 @@ export default function NewProjectPage() {
           length,
           width,
           area,
+          boundaryCoordinates,
         },
         isCornerPlot,
         roadWidthPrimary: parseFloat(roadWidthPrimary),
@@ -97,7 +142,13 @@ export default function NewProjectPage() {
     }
   };
 
-  const isStep1Valid = projectName && address && plotLength && plotWidth && roadWidthPrimary;
+  // Validation based on plot type
+  const isPlotDimensionsValid =
+    plotType === 'rectangular'
+      ? plotLength && plotWidth
+      : siteBoundary !== null;
+
+  const isStep1Valid = projectName && address && isPlotDimensionsValid && roadWidthPrimary;
 
   return (
     <div className="min-h-screen gradient-mesh">
@@ -206,36 +257,115 @@ export default function NewProjectPage() {
               <div className="space-y-5 pt-6 border-t border-slate-200">
                 <h3 className="font-bold text-xl text-slate-900 tracking-tight">Plot Dimensions</h3>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <Input
-                    label="Plot Length (m)"
-                    type="number"
-                    step="0.01"
-                    value={plotLength}
-                    onChange={(e) => setPlotLength(e.target.value)}
-                    placeholder="30.00"
-                    required
-                  />
-                  <Input
-                    label="Plot Width (m)"
-                    type="number"
-                    step="0.01"
-                    value={plotWidth}
-                    onChange={(e) => setPlotWidth(e.target.value)}
-                    placeholder="20.00"
-                    required
-                  />
+                {/* Plot Type Toggle */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">Plot Shape</label>
+                  <div className="inline-flex rounded-lg border border-gray-300 p-1 bg-gray-50">
+                    <button
+                      type="button"
+                      onClick={() => setPlotType('rectangular')}
+                      className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
+                        plotType === 'rectangular'
+                          ? 'bg-white text-cyan-700 shadow-sm border border-gray-200'
+                          : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                    >
+                      Rectangular Plot
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPlotType('irregular')}
+                      className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
+                        plotType === 'irregular'
+                          ? 'bg-white text-cyan-700 shadow-sm border border-gray-200'
+                          : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                    >
+                      Irregular Site Boundary
+                    </button>
+                  </div>
                 </div>
 
-                {plotLength && plotWidth && (
-                  <div className="p-4 bg-cyan-50/80 border-2 border-cyan-200 rounded-xl">
-                    <p className="text-base text-cyan-900 font-semibold">
-                      <span className="font-bold">Plot Area:</span>{' '}
-                      {(parseFloat(plotLength) * parseFloat(plotWidth)).toFixed(2)} sq.m
-                    </p>
-                  </div>
+                {/* Rectangular Plot Inputs */}
+                {plotType === 'rectangular' && (
+                  <>
+                    <div className="grid grid-cols-2 gap-4">
+                      <Input
+                        label="Plot Length (m)"
+                        type="number"
+                        step="0.01"
+                        value={plotLength}
+                        onChange={(e) => setPlotLength(e.target.value)}
+                        placeholder="30.00"
+                        required
+                      />
+                      <Input
+                        label="Plot Width (m)"
+                        type="number"
+                        step="0.01"
+                        value={plotWidth}
+                        onChange={(e) => setPlotWidth(e.target.value)}
+                        placeholder="20.00"
+                        required
+                      />
+                    </div>
+
+                    {plotLength && plotWidth && (
+                      <div className="p-4 bg-cyan-50/80 border-2 border-cyan-200 rounded-xl">
+                        <p className="text-base text-cyan-900 font-semibold">
+                          <span className="font-bold">Plot Area:</span>{' '}
+                          {(parseFloat(plotLength) * parseFloat(plotWidth)).toFixed(2)} sq.m
+                        </p>
+                      </div>
+                    )}
+                  </>
                 )}
 
+                {/* Irregular Plot - Map Polygon Picker */}
+                {plotType === 'irregular' && (
+                  <>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-700">
+                        Draw Site Boundary
+                      </label>
+                      <p className="text-xs text-gray-600">
+                        Use the polygon drawing tool on the map to trace your site boundary
+                      </p>
+                    </div>
+
+                    <MapPolygonPicker
+                      value={
+                        siteBoundary
+                          ? {
+                              center: siteBoundary.center,
+                              polygon: siteBoundary.polygon,
+                              area: siteBoundary.area,
+                              perimeter: siteBoundary.perimeter,
+                            }
+                          : {
+                              center: location,
+                            }
+                      }
+                      onChange={(data) => {
+                        setSiteBoundary(data);
+                        // Update map center for location
+                        setLocation(data.center);
+                        setLatitude(data.center.lat.toString());
+                        setLongitude(data.center.lng.toString());
+                      }}
+                    />
+
+                    {!siteBoundary && (
+                      <div className="p-4 bg-orange-50/80 border-2 border-orange-200 rounded-xl">
+                        <p className="text-sm text-orange-900 font-medium">
+                          Please draw the site boundary on the map to continue
+                        </p>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {/* Corner Plot Checkbox */}
                 <div className="flex items-center space-x-2">
                   <input
                     type="checkbox"

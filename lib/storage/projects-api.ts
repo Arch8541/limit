@@ -61,6 +61,7 @@ export async function createProject(userId: string, siteData: SiteData): Promise
     plotLength: siteData.plotDimensions.length,
     plotWidth: siteData.plotDimensions.width,
     plotArea: siteData.plotDimensions.area,
+    boundaryCoordinates: siteData.plotDimensions.boundaryCoordinates,
     isCornerPlot: siteData.isCornerPlot,
     roadWidthPrimary: siteData.roadWidthPrimary,
     roadWidthSecondary: siteData.roadWidthSecondary,
