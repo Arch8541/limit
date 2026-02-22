@@ -220,7 +220,8 @@ export default function NewProjectPage() {
                       setLocation(loc);
                       setLatitude(loc.lat.toString());
                       setLongitude(loc.lng.toString());
-                      if (loc.address && !address) {
+                      // Always update address when location changes
+                      if (loc.address) {
                         setAddress(loc.address);
                       }
                     }}

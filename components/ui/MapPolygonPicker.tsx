@@ -76,12 +76,33 @@ export function MapPolygonPicker({ value, onChange, className = '' }: MapPolygon
     setIsSearching(true);
     try {
       // Using Nominatim (OpenStreetMap) geocoding service
-      const response = await fetch(
+      // First try with Ahmedabad context
+      let response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
           searchQuery + ', Ahmedabad, Gujarat, India'
         )}&limit=1`
       );
-      const data = await response.json();
+      let data = await response.json();
+
+      // If no results with Ahmedabad context, try general search
+      if (!data || data.length === 0) {
+        response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+            searchQuery + ', Gujarat, India'
+          )}&limit=1`
+        );
+        data = await response.json();
+      }
+
+      // If still no results, try without any context
+      if (!data || data.length === 0) {
+        response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+            searchQuery
+          )}&limit=1`
+        );
+        data = await response.json();
+      }
 
       if (data && data.length > 0) {
         const newCenter = {
@@ -89,6 +110,8 @@ export function MapPolygonPicker({ value, onChange, className = '' }: MapPolygon
           lng: parseFloat(data[0].lon),
         };
         setCenter(newCenter);
+      } else {
+        console.warn('No results found for search query:', searchQuery);
       }
     } catch (error) {
       console.error('Error searching location:', error);
@@ -137,47 +160,47 @@ export function MapPolygonPicker({ value, onChange, className = '' }: MapPolygon
           </Button>
         </div>
 
-        <div className="glass rounded-2xl p-4 space-y-3">
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 space-y-3 border border-slate-200 shadow-sm">
           <div className="flex items-start gap-2">
             <MapPin className="w-5 h-5 text-teal-600 mt-0.5 flex-shrink-0" />
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900">Map Center</p>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-sm font-medium text-slate-900">Map Center</p>
+              <p className="text-xs text-slate-600 mt-1">
                 {center.lat.toFixed(6)}, {center.lng.toFixed(6)}
               </p>
             </div>
           </div>
 
           {polygonData && (
-            <div className="pt-3 border-t border-stone-200">
+            <div className="pt-3 border-t border-slate-200">
               <div className="flex items-start gap-2">
                 <Maximize2 className="w-5 h-5 text-teal-600 mt-0.5 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900">Site Boundary Drawn</p>
+                  <p className="text-sm font-medium text-slate-900">Site Boundary Drawn</p>
                   <div className="mt-2 grid grid-cols-2 gap-3">
                     <div>
-                      <p className="text-xs text-gray-600">Area</p>
+                      <p className="text-xs text-slate-700">Area</p>
                       <p className="text-sm font-semibold text-teal-700">
                         {formatArea(polygonData.area).sqMeters} m²
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-slate-600">
                         {formatArea(polygonData.area).sqFeet} sq ft
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-slate-600">
                         {formatArea(polygonData.area).acres} acres
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-600">Perimeter</p>
+                      <p className="text-xs text-slate-700">Perimeter</p>
                       <p className="text-sm font-semibold text-teal-700">
                         {polygonData.perimeter.toFixed(2)} m
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-slate-600">
                         {(polygonData.perimeter * 3.28084).toFixed(2)} ft
                       </p>
                     </div>
                   </div>
-                  <p className="text-xs text-gray-500 mt-2">
+                  <p className="text-xs text-slate-600 mt-2">
                     Vertices: {polygonData.coordinates.length}
                   </p>
                 </div>
@@ -186,8 +209,8 @@ export function MapPolygonPicker({ value, onChange, className = '' }: MapPolygon
           )}
 
           {!polygonData && (
-            <div className="pt-3 border-t border-stone-200">
-              <p className="text-xs text-gray-600 text-center">
+            <div className="pt-3 border-t border-slate-200">
+              <p className="text-xs text-slate-700 text-center">
                 No site boundary drawn yet. Use the polygon tool on the map.
               </p>
             </div>

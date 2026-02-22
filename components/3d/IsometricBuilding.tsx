@@ -451,40 +451,40 @@ export function IsometricBuilding({
 
         {/* Dimension Labels */}
         <div className="mt-6 grid grid-cols-2 gap-4">
-          <div className="glass rounded-xl p-4 font-mono text-xs space-y-2">
+          <div className="bg-white/90 backdrop-blur-sm border border-slate-200 shadow-sm rounded-xl p-4 font-mono text-xs space-y-2">
             <div className="flex items-center justify-between gap-4">
-              <span className="text-slate-600">Plot Dimensions:</span>
+              <span className="text-slate-700">Plot Dimensions:</span>
               <span className="font-bold text-slate-900">{plotWidth}m × {plotDepth}m</span>
             </div>
             <div className="flex items-center justify-between gap-4">
-              <span className="text-slate-600">Building Size:</span>
+              <span className="text-slate-700">Building Size:</span>
               <span className="font-bold text-slate-900">
                 {buildingWidth.toFixed(1)}m × {buildingDepth.toFixed(1)}m
               </span>
             </div>
             <div className="flex items-center justify-between gap-4">
-              <span className="text-slate-600">Height:</span>
+              <span className="text-slate-700">Height:</span>
               <span className="font-bold text-cyan-600">{buildingHeight.toFixed(1)}m</span>
             </div>
             <div className="flex items-center justify-between gap-4">
-              <span className="text-slate-600">Floors:</span>
+              <span className="text-slate-700">Floors:</span>
               <span className="font-bold text-slate-900">~{numFloors}</span>
             </div>
           </div>
 
-          <div className="glass rounded-xl p-4 font-mono text-xs space-y-2">
+          <div className="bg-white/90 backdrop-blur-sm border border-slate-200 shadow-sm rounded-xl p-4 font-mono text-xs space-y-2">
             <div className="font-bold text-slate-900 mb-2">Setbacks (m)</div>
             <div className="grid grid-cols-3 gap-3 text-center">
               <div>
-                <div className="text-slate-600 text-[10px]">FRONT</div>
+                <div className="text-slate-700 text-[10px]">FRONT</div>
                 <div className="font-bold text-cyan-600">{setbacks.front}</div>
               </div>
               <div>
-                <div className="text-slate-600 text-[10px]">SIDE</div>
+                <div className="text-slate-700 text-[10px]">SIDE</div>
                 <div className="font-bold text-cyan-600">{setbacks.side}</div>
               </div>
               <div>
-                <div className="text-slate-600 text-[10px]">REAR</div>
+                <div className="text-slate-700 text-[10px]">REAR</div>
                 <div className="font-bold text-cyan-600">{setbacks.rear}</div>
               </div>
             </div>

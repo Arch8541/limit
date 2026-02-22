@@ -180,27 +180,27 @@ export function BuildingPreview({
         </div>
 
         {/* Labels */}
-        <div className="absolute bottom-4 left-4 right-4 glass rounded-xl p-3">
+        <div className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-sm border border-slate-200 shadow-sm rounded-xl p-3">
           <div className="grid grid-cols-2 gap-3 text-xs">
             <div>
-              <span className="text-gray-600">Plot:</span>{' '}
-              <span className="font-semibold text-gray-900">
+              <span className="text-slate-700">Plot:</span>{' '}
+              <span className="font-semibold text-slate-900">
                 {plotWidth} × {plotDepth} m
               </span>
             </div>
             <div>
-              <span className="text-gray-600">Building:</span>{' '}
-              <span className="font-semibold text-gray-900">
+              <span className="text-slate-700">Building:</span>{' '}
+              <span className="font-semibold text-slate-900">
                 {buildingWidth.toFixed(1)} × {buildingDepth.toFixed(1)} m
               </span>
             </div>
             <div>
-              <span className="text-gray-600">Height:</span>{' '}
-              <span className="font-semibold text-gray-900">{buildingHeight.toFixed(1)} m</span>
+              <span className="text-slate-700">Height:</span>{' '}
+              <span className="font-semibold text-slate-900">{buildingHeight.toFixed(1)} m</span>
             </div>
             <div>
-              <span className="text-gray-600">Coverage:</span>{' '}
-              <span className="font-semibold text-gray-900">{groundCoverage.toFixed(1)}%</span>
+              <span className="text-slate-700">Coverage:</span>{' '}
+              <span className="font-semibold text-slate-900">{groundCoverage.toFixed(1)}%</span>
             </div>
           </div>
         </div>

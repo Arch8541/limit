@@ -44,12 +44,33 @@ export function MapPicker({ value, onChange, className = '' }: MapPickerProps) {
     setIsSearching(true);
     try {
       // Using Nominatim (OpenStreetMap) geocoding service
-      const response = await fetch(
+      // First try with Ahmedabad context
+      let response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
           searchQuery + ', Ahmedabad, Gujarat, India'
         )}&limit=1`
       );
-      const data = await response.json();
+      let data = await response.json();
+
+      // If no results with Ahmedabad context, try general search
+      if (!data || data.length === 0) {
+        response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+            searchQuery + ', Gujarat, India'
+          )}&limit=1`
+        );
+        data = await response.json();
+      }
+
+      // If still no results, try without any context
+      if (!data || data.length === 0) {
+        response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+            searchQuery
+          )}&limit=1`
+        );
+        data = await response.json();
+      }
 
       if (data && data.length > 0) {
         const location = {
@@ -59,6 +80,8 @@ export function MapPicker({ value, onChange, className = '' }: MapPickerProps) {
         };
         setSelectedLocation(location);
         onChange(location);
+      } else {
+        console.warn('No results found for search query:', searchQuery);
       }
     } catch (error) {
       console.error('Error searching location:', error);
@@ -107,15 +130,15 @@ export function MapPicker({ value, onChange, className = '' }: MapPickerProps) {
           </Button>
         </div>
 
-        <div className="glass rounded-2xl p-4 space-y-2">
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 space-y-2 border border-slate-200 shadow-sm">
           <div className="flex items-start gap-2">
             <MapPin className="w-5 h-5 text-teal-600 mt-0.5 flex-shrink-0" />
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900">Selected Location</p>
-              <p className="text-xs text-gray-600 truncate">
+              <p className="text-sm font-medium text-slate-900">Selected Location</p>
+              <p className="text-xs text-slate-600 truncate">
                 {selectedLocation.address || 'Click on map to select location'}
               </p>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-slate-500 mt-1">
                 Coordinates: {selectedLocation.lat.toFixed(6)}, {selectedLocation.lng.toFixed(6)}
               </p>
             </div>
