@@ -27,9 +27,9 @@
 
   /* Text - High contrast hierarchy */
   --text-primary: #FAFAFA;
-  --text-secondary: #A1A1AA;
-  --text-tertiary: #71717A;
-  --text-muted: #52525B;
+  --text-secondary: #D4D4D8;
+  --text-tertiary: #A1A1AA;
+  --text-muted: #71717A;
 
   /* Light mode text */
   --text-light-primary: #09090B;
@@ -49,17 +49,17 @@
   --blueprint-subtle: rgba(6, 182, 212, 0.1);
 
   /* Status colors */
-  --success: #22C55E;
-  --success-muted: #16A34A;
-  --success-bg: rgba(34, 197, 94, 0.1);
+  --success: #4ADE80;
+  --success-muted: #22C55E;
+  --success-bg: rgba(34, 197, 94, 0.2);
 
-  --warning: #EAB308;
-  --warning-muted: #CA8A04;
-  --warning-bg: rgba(234, 179, 8, 0.1);
+  --warning: #FACC15;
+  --warning-muted: #EAB308;
+  --warning-bg: rgba(234, 179, 8, 0.2);
 
-  --error: #EF4444;
-  --error-muted: #DC2626;
-  --error-bg: rgba(239, 68, 68, 0.1);
+  --error: #F87171;
+  --error-muted: #EF4444;
+  --error-bg: rgba(239, 68, 68, 0.2);
 
   /* Borders & Lines */
   --border-subtle: rgba(255, 255, 255, 0.06);
