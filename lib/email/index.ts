@@ -1,30 +1,10 @@
-// Email service supporting multiple backends: AWS SES, Resend, or Console logging
-// Set EMAIL_PROVIDER env var to: 'ses', 'resend', or 'console' (default)
+// Email service using Resend API
+// Set RESEND_API_KEY env var to enable email sending
+// Falls back to console logging if not configured
 
-import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
-
-// Configuration
-const EMAIL_PROVIDER = process.env.EMAIL_PROVIDER || 'console'; // 'ses', 'resend', 'console'
-const FROM_EMAIL = process.env.EMAIL_FROM || 'noreply@example.com';
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const FROM_EMAIL = process.env.EMAIL_FROM || 'LIMIT Platform <onboarding@resend.dev>';
 const NEXTAUTH_URL = process.env.NEXTAUTH_URL || process.env.AUTH_URL || 'http://localhost:3000';
-
-// AWS SES Client (lazy initialized)
-let sesClient: SESClient | null = null;
-
-function getSESClient(): SESClient {
-  if (!sesClient) {
-    sesClient = new SESClient({
-      region: process.env.AWS_REGION || 'ap-south-1', // Mumbai region (same as Amplify)
-      credentials: process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY
-        ? {
-            accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-          }
-        : undefined, // Use default credentials (IAM role) if not specified
-    });
-  }
-  return sesClient;
-}
 
 interface SendEmailOptions {
   to: string;
@@ -32,44 +12,18 @@ interface SendEmailOptions {
   html: string;
 }
 
-// Send email via AWS SES
-async function sendWithSES({ to, subject, html }: SendEmailOptions): Promise<boolean> {
-  try {
-    const client = getSESClient();
-    const command = new SendEmailCommand({
-      Source: FROM_EMAIL,
-      Destination: {
-        ToAddresses: [to],
-      },
-      Message: {
-        Subject: { Data: subject, Charset: 'UTF-8' },
-        Body: {
-          Html: { Data: html, Charset: 'UTF-8' },
-        },
-      },
-    });
-
-    const result = await client.send(command);
-    console.log('Email sent via AWS SES:', { to, subject, messageId: result.MessageId });
-    return true;
-  } catch (error: any) {
-    console.error('AWS SES error:', {
-      message: error.message,
-      code: error.Code || error.name,
-      to,
-      subject,
-    });
-    return false;
-  }
-}
-
-// Send email via Resend API
-async function sendWithResend({ to, subject, html }: SendEmailOptions): Promise<boolean> {
-  const RESEND_API_KEY = process.env.RESEND_API_KEY;
-
+async function sendEmail({ to, subject, html }: SendEmailOptions): Promise<boolean> {
+  // Console logging if no API key (development mode)
   if (!RESEND_API_KEY) {
-    console.error('RESEND_API_KEY not configured');
-    return false;
+    const verificationUrl = html.match(/https?:\/\/[^\s"<]+verify[^\s"<]*/)?.[0] || 'N/A';
+    console.log('\n' + '='.repeat(60));
+    console.log('EMAIL (Dev Mode - Add RESEND_API_KEY for real emails)');
+    console.log('='.repeat(60));
+    console.log(`To: ${to}`);
+    console.log(`Subject: ${subject}`);
+    console.log(`Verification URL: ${verificationUrl}`);
+    console.log('='.repeat(60) + '\n');
+    return true;
   }
 
   try {
@@ -91,53 +45,20 @@ async function sendWithResend({ to, subject, html }: SendEmailOptions): Promise<
       const errorText = await response.text();
       console.error('Resend API error:', {
         status: response.status,
-        statusText: response.statusText,
         error: errorText,
       });
       return false;
     }
 
     const result = await response.json();
-    console.log('Email sent via Resend:', { to, subject, id: result.id });
+    console.log('Email sent successfully:', { to, subject, id: result.id });
     return true;
   } catch (error) {
-    console.error('Resend error:', error);
+    console.error('Failed to send email:', error);
     return false;
   }
 }
 
-// Log email to console (development mode)
-function sendWithConsole({ to, subject, html }: SendEmailOptions): boolean {
-  const verificationUrl = html.match(/https?:\/\/[^\s"<]+verify[^\s"<]*/)?.[0] || 'N/A';
-
-  console.log('\n' + '='.repeat(60));
-  console.log('EMAIL (Console Mode - No provider configured)');
-  console.log('='.repeat(60));
-  console.log(`To: ${to}`);
-  console.log(`Subject: ${subject}`);
-  console.log(`From: ${FROM_EMAIL}`);
-  console.log(`Verification URL: ${verificationUrl}`);
-  console.log('='.repeat(60) + '\n');
-
-  return true;
-}
-
-// Main email sending function - routes to appropriate provider
-async function sendEmail(options: SendEmailOptions): Promise<boolean> {
-  const provider = EMAIL_PROVIDER.toLowerCase();
-
-  switch (provider) {
-    case 'ses':
-      return sendWithSES(options);
-    case 'resend':
-      return sendWithResend(options);
-    case 'console':
-    default:
-      return sendWithConsole(options);
-  }
-}
-
-// Verification email template
 export async function sendVerificationEmail({
   to,
   name,
@@ -210,7 +131,6 @@ export async function sendVerificationEmail({
   });
 }
 
-// Welcome email template
 export async function sendWelcomeEmail({
   to,
   name,
