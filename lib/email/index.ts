@@ -1,10 +1,30 @@
-// Simple email service using Resend API
-// Gracefully degrades if RESEND_API_KEY is not set
+// Email service supporting multiple backends: AWS SES, Resend, or Console logging
+// Set EMAIL_PROVIDER env var to: 'ses', 'resend', or 'console' (default)
 
-const RESEND_API_KEY = process.env.RESEND_API_KEY;
-// Use Resend's test email address if no custom domain is configured
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'LIMIT Platform <onboarding@resend.dev>';
-const NEXTAUTH_URL = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
+
+// Configuration
+const EMAIL_PROVIDER = process.env.EMAIL_PROVIDER || 'console'; // 'ses', 'resend', 'console'
+const FROM_EMAIL = process.env.EMAIL_FROM || 'noreply@example.com';
+const NEXTAUTH_URL = process.env.NEXTAUTH_URL || process.env.AUTH_URL || 'http://localhost:3000';
+
+// AWS SES Client (lazy initialized)
+let sesClient: SESClient | null = null;
+
+function getSESClient(): SESClient {
+  if (!sesClient) {
+    sesClient = new SESClient({
+      region: process.env.AWS_REGION || 'ap-south-1', // Mumbai region (same as Amplify)
+      credentials: process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY
+        ? {
+            accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+          }
+        : undefined, // Use default credentials (IAM role) if not specified
+    });
+  }
+  return sesClient;
+}
 
 interface SendEmailOptions {
   to: string;
@@ -12,15 +32,44 @@ interface SendEmailOptions {
   html: string;
 }
 
-async function sendEmail({ to, subject, html }: SendEmailOptions): Promise<boolean> {
-  if (!RESEND_API_KEY) {
-    console.log('\n=== EMAIL (Development Mode - No RESEND_API_KEY) ===');
-    console.log(`To: ${to}`);
-    console.log(`Subject: ${subject}`);
-    console.log(`From: ${FROM_EMAIL}`);
-    console.log(`Verification URL: ${html.match(/https?:\/\/[^\s"]+/)?.[0] || 'N/A'}`);
-    console.log('=== END EMAIL ===\n');
+// Send email via AWS SES
+async function sendWithSES({ to, subject, html }: SendEmailOptions): Promise<boolean> {
+  try {
+    const client = getSESClient();
+    const command = new SendEmailCommand({
+      Source: FROM_EMAIL,
+      Destination: {
+        ToAddresses: [to],
+      },
+      Message: {
+        Subject: { Data: subject, Charset: 'UTF-8' },
+        Body: {
+          Html: { Data: html, Charset: 'UTF-8' },
+        },
+      },
+    });
+
+    const result = await client.send(command);
+    console.log('Email sent via AWS SES:', { to, subject, messageId: result.MessageId });
     return true;
+  } catch (error: any) {
+    console.error('AWS SES error:', {
+      message: error.message,
+      code: error.Code || error.name,
+      to,
+      subject,
+    });
+    return false;
+  }
+}
+
+// Send email via Resend API
+async function sendWithResend({ to, subject, html }: SendEmailOptions): Promise<boolean> {
+  const RESEND_API_KEY = process.env.RESEND_API_KEY;
+
+  if (!RESEND_API_KEY) {
+    console.error('RESEND_API_KEY not configured');
+    return false;
   }
 
   try {
@@ -49,14 +98,46 @@ async function sendEmail({ to, subject, html }: SendEmailOptions): Promise<boole
     }
 
     const result = await response.json();
-    console.log('Email sent successfully:', { to, subject, id: result.id });
+    console.log('Email sent via Resend:', { to, subject, id: result.id });
     return true;
   } catch (error) {
-    console.error('Failed to send email:', error);
+    console.error('Resend error:', error);
     return false;
   }
 }
 
+// Log email to console (development mode)
+function sendWithConsole({ to, subject, html }: SendEmailOptions): boolean {
+  const verificationUrl = html.match(/https?:\/\/[^\s"<]+verify[^\s"<]*/)?.[0] || 'N/A';
+
+  console.log('\n' + '='.repeat(60));
+  console.log('EMAIL (Console Mode - No provider configured)');
+  console.log('='.repeat(60));
+  console.log(`To: ${to}`);
+  console.log(`Subject: ${subject}`);
+  console.log(`From: ${FROM_EMAIL}`);
+  console.log(`Verification URL: ${verificationUrl}`);
+  console.log('='.repeat(60) + '\n');
+
+  return true;
+}
+
+// Main email sending function - routes to appropriate provider
+async function sendEmail(options: SendEmailOptions): Promise<boolean> {
+  const provider = EMAIL_PROVIDER.toLowerCase();
+
+  switch (provider) {
+    case 'ses':
+      return sendWithSES(options);
+    case 'resend':
+      return sendWithResend(options);
+    case 'console':
+    default:
+      return sendWithConsole(options);
+  }
+}
+
+// Verification email template
 export async function sendVerificationEmail({
   to,
   name,
@@ -80,7 +161,7 @@ export async function sendVerificationEmail({
   <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
     <div style="background: white; border-radius: 16px; padding: 40px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
       <div style="text-align: center; margin-bottom: 32px;">
-        <div style="display: inline-block; background: linear-gradient(135deg, #14b8a6, #0891b2); width: 64px; height: 64px; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+        <div style="display: inline-block; background: linear-gradient(135deg, #14b8a6, #0891b2); width: 64px; height: 64px; border-radius: 16px; margin-bottom: 16px; line-height: 64px; text-align: center;">
           <span style="color: white; font-size: 32px; font-weight: bold;">L</span>
         </div>
         <h1 style="margin: 0; font-size: 28px; color: #111827; font-weight: 800;">LIMIT Platform</h1>
@@ -129,6 +210,7 @@ export async function sendVerificationEmail({
   });
 }
 
+// Welcome email template
 export async function sendWelcomeEmail({
   to,
   name,
