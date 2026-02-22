@@ -2,9 +2,29 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
+import { Card, FeatureCard } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
 import { isAuthenticated } from '@/lib/auth';
-import { Building2, FileCheck, Zap, Shield, BarChart3, Clock, Sparkles, TrendingUp, Users } from 'lucide-react';
+import {
+  Building2,
+  FileCheck,
+  Zap,
+  Shield,
+  BarChart3,
+  Clock,
+  ArrowRight,
+  Sparkles,
+  CheckCircle2,
+  MapPin,
+  Ruler,
+  Calculator,
+  FileText,
+  Users,
+  Star,
+  ChevronRight,
+} from 'lucide-react';
 
 export default function LandingPage() {
   const router = useRouter();
@@ -12,7 +32,6 @@ export default function LandingPage() {
 
   useEffect(() => {
     setMounted(true);
-    // Redirect to dashboard if already logged in
     if (isAuthenticated()) {
       router.push('/dashboard');
     }
@@ -26,269 +45,405 @@ export default function LandingPage() {
     {
       icon: <FileCheck className="w-6 h-6" />,
       title: 'Automated Compliance',
-      description: 'Extract plot data from drawings and calculate GDCR 2017 regulations automatically',
+      description:
+        'Extract plot data from drawings and calculate GDCR 2017 regulations automatically with AI precision.',
     },
     {
       icon: <Zap className="w-6 h-6" />,
       title: 'Instant Reports',
-      description: 'Generate comprehensive PDF reports with calculations, formulas, and regulatory clauses',
+      description:
+        'Generate comprehensive PDF reports with calculations, formulas, and regulatory clause references.',
     },
     {
       icon: <Building2 className="w-6 h-6" />,
-      title: 'All Parameters',
-      description: 'FSI, height, setbacks, parking, fire safety, and accessibility requirements',
+      title: 'Complete Analysis',
+      description:
+        'FSI, building height, setbacks, parking requirements, fire safety, and accessibility - all covered.',
     },
     {
       icon: <BarChart3 className="w-6 h-6" />,
-      title: 'Bulk Analysis',
-      description: 'Process multiple sites simultaneously and compare regulatory constraints',
+      title: 'Bulk Processing',
+      description:
+        'Analyze multiple sites simultaneously and compare regulatory constraints across projects.',
     },
     {
       icon: <Shield className="w-6 h-6" />,
-      title: 'Transparent Calculations',
-      description: 'See all formulas and methodology with GDCR clause references',
+      title: 'Transparent Logic',
+      description:
+        'See all formulas and methodology with direct GDCR clause references for every calculation.',
     },
     {
       icon: <Clock className="w-6 h-6" />,
-      title: 'Save Time',
-      description: 'Reduce manual calculation time from hours to minutes',
+      title: 'Time Efficient',
+      description:
+        'Reduce manual calculation time from hours to minutes. Focus on design, not paperwork.',
+    },
+  ];
+
+  const steps = [
+    {
+      number: '01',
+      title: 'Input Site Data',
+      description: 'Upload drawings or manually enter plot dimensions using our interactive map interface.',
+      icon: <MapPin className="w-5 h-5" />,
+    },
+    {
+      number: '02',
+      title: 'Configure Parameters',
+      description: 'Select authority, zone, intended use, and special conditions for accurate calculations.',
+      icon: <Ruler className="w-5 h-5" />,
+    },
+    {
+      number: '03',
+      title: 'Review Calculations',
+      description: 'Verify FSI, setbacks, height limits, and all regulatory parameters with 3D preview.',
+      icon: <Calculator className="w-5 h-5" />,
+    },
+    {
+      number: '04',
+      title: 'Export Report',
+      description: 'Download professional PDF documentation with all calculations and clause references.',
+      icon: <FileText className="w-5 h-5" />,
+    },
+  ];
+
+  const testimonials = [
+    {
+      quote: "LIMIT has transformed how we handle GDCR compliance. What used to take hours now takes minutes.",
+      author: 'Priya Sharma',
+      role: 'Principal Architect, Sharma & Associates',
+      avatar: 'PS',
+    },
+    {
+      quote: 'The transparent calculation methodology gives us confidence when presenting to clients and authorities.',
+      author: 'Rajesh Patel',
+      role: 'Senior Developer, Urban Spaces Ltd.',
+      avatar: 'RP',
+    },
+    {
+      quote: 'Bulk analysis feature is a game-changer for site comparison and feasibility studies.',
+      author: 'Ankit Mehta',
+      role: 'Investment Analyst, Gujarat Realty',
+      avatar: 'AM',
     },
   ];
 
   return (
-    <div className="min-h-screen gradient-mesh">
-      {/* Header */}
-      <header className="border-b border-slate-200/60 glass sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)]">
+      {/* Ambient background */}
+      <div className="fixed inset-0 bg-gradient-mesh pointer-events-none" />
+      <div className="fixed inset-0 bg-blueprint-grid opacity-30 pointer-events-none" />
+
+      {/* Navigation */}
+      <header className="relative z-50 border-b border-[var(--border-subtle)]">
+        <nav className="container-wide py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-14 h-14 bg-gradient-to-br from-cyan-600 via-cyan-500 to-cyan-600 rounded-2xl flex items-center justify-center shadow-lg hover:shadow-xl hover:shadow-cyan-500/30 transform hover:scale-105 transition-all duration-300">
-                <Building2 className="w-8 h-8 text-white" />
+            {/* Logo */}
+            <Link href="/" className="flex items-center gap-3 group">
+              <div className="w-10 h-10 rounded-[var(--radius-lg)] bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center shadow-lg transition-transform group-hover:scale-105">
+                <Building2 className="w-5 h-5 text-[var(--bg-primary)]" />
               </div>
-              <span className="text-3xl font-extrabold gradient-text tracking-tight">LIMIT</span>
+              <span className="text-xl font-bold tracking-tight">LIMIT</span>
+            </Link>
+
+            {/* Nav links */}
+            <div className="hidden md:flex items-center gap-8">
+              <a href="#features" className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
+                Features
+              </a>
+              <a href="#how-it-works" className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
+                How it Works
+              </a>
+              <a href="#testimonials" className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
+                Testimonials
+              </a>
             </div>
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" onClick={() => router.push('/login')}>
-                Login
+
+            {/* CTA buttons */}
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" size="sm" onClick={() => router.push('/login')}>
+                Sign In
               </Button>
-              <Button variant="gradient" onClick={() => router.push('/register')}>
-                Get Started Free
+              <Button variant="primary" size="sm" onClick={() => router.push('/register')}>
+                Get Started
+                <ArrowRight className="w-4 h-4" />
               </Button>
             </div>
           </div>
-        </div>
+        </nav>
       </header>
 
       {/* Hero Section */}
-      <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 overflow-hidden">
-        {/* Floating decoration - More subtle and elegant */}
-        <div className="absolute top-32 right-20 w-96 h-96 bg-gradient-to-br from-cyan-400/15 to-indigo-300/15 rounded-full blur-3xl float-animation" />
-        <div className="absolute bottom-32 left-20 w-[32rem] h-[32rem] bg-gradient-to-br from-violet-400/10 to-amber-300/10 rounded-full blur-3xl float-animation" style={{ animationDelay: '2s' }} />
+      <section className="relative section-spacing">
+        <div className="container-wide">
+          <div className="max-w-4xl mx-auto text-center stagger-children">
+            {/* Badge */}
+            <Badge variant="accent" size="md" className="mb-8">
+              <Sparkles className="w-3.5 h-3.5" />
+              GDCR 2017 Compliance Platform
+            </Badge>
 
-        <div className="relative text-center max-w-5xl mx-auto">
-          <div className="inline-flex items-center gap-2.5 glass-card rounded-full px-6 py-3 mb-10 hover-scale">
-            <Sparkles className="w-5 h-5 text-cyan-600" />
-            <span className="text-sm font-bold text-slate-700 tracking-wide">AI-Powered GDCR 2017 Compliance</span>
-          </div>
+            {/* Headline */}
+            <h1 className="heading-display text-[var(--text-primary)] mb-6">
+              Building Regulation{' '}
+              <span className="text-gradient font-normal">Made Simple</span>
+            </h1>
 
-          <h1 className="heading-xl text-slate-900 mb-8 text-balance">
-            Building Regulation
-            <span className="block gradient-text mt-3">Made Simple</span>
-          </h1>
+            {/* Subheadline */}
+            <p className="body-large max-w-2xl mx-auto mb-10 text-balance">
+              Professional SaaS platform for instant GDCR 2017 compliance analysis in Gujarat.
+              Get comprehensive regulatory reports in minutes, not hours.
+            </p>
 
-          <p className="body-lg text-slate-600 mb-12 max-w-3xl mx-auto text-balance">
-            Professional SaaS platform for instant GDCR 2017 compliance analysis in Gujarat/Ahmedabad.
-            Get comprehensive regulatory reports in minutes, not hours.
-          </p>
-
-          <div className="flex items-center justify-center gap-5 flex-wrap mb-16">
-            <Button size="lg" variant="gradient" onClick={() => router.push('/register')}>
-              Start Free Trial
-            </Button>
-            <Button size="lg" variant="ghost" onClick={() => router.push('/login')}>
-              View Demo
-            </Button>
-          </div>
-
-          <div className="mt-16 grid grid-cols-3 gap-12 max-w-3xl mx-auto">
-            <div className="text-center group">
-              <div className="text-5xl font-extrabold gradient-text mb-2 group-hover:scale-110 transition-transform">5 min</div>
-              <div className="text-sm font-medium text-slate-600 tracking-wide">Average Report Time</div>
+            {/* CTA buttons */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+              <Button variant="primary" size="lg" onClick={() => router.push('/register')}>
+                Start Free Analysis
+                <ArrowRight className="w-5 h-5" />
+              </Button>
+              <Button variant="secondary" size="lg" onClick={() => router.push('/login')}>
+                View Demo Project
+              </Button>
             </div>
-            <div className="text-center group">
-              <div className="text-5xl font-extrabold gradient-text mb-2 group-hover:scale-110 transition-transform">100%</div>
-              <div className="text-sm font-medium text-slate-600 tracking-wide">GDCR Compliant</div>
-            </div>
-            <div className="text-center group">
-              <div className="text-5xl font-extrabold gradient-text mb-2 group-hover:scale-110 transition-transform">500+</div>
-              <div className="text-sm font-medium text-slate-600 tracking-wide">Sites Analyzed</div>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Features Grid */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 section-spacing">
-        <div className="text-center mb-20">
-          <h2 className="heading-md text-slate-900 mb-6">
-            Everything You Need for <span className="gradient-text">Compliance</span>
-          </h2>
-          <p className="body-lg text-slate-600 max-w-2xl mx-auto">
-            Comprehensive GDCR 2017 analysis with transparent calculations
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {features.map((feature, index) => (
-            <div
-              key={index}
-              className="glass-card p-10 rounded-2xl hover-lift border border-white/60 group"
-            >
-              <div className="w-16 h-16 bg-gradient-to-br from-cyan-600 via-cyan-500 to-cyan-600 rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg hover:shadow-xl group-hover:shadow-cyan-500/40 group-hover:scale-110 transition-all duration-300">
-                {feature.icon}
+            {/* Stats */}
+            <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto">
+              <div className="text-center">
+                <div className="text-4xl font-bold text-gradient mb-1">5 min</div>
+                <div className="text-sm text-[var(--text-tertiary)] font-mono uppercase tracking-wider">
+                  Avg. Report Time
+                </div>
               </div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-4 tracking-tight">
-                {feature.title}
-              </h3>
-              <p className="text-slate-600 leading-relaxed text-base">{feature.description}</p>
+              <div className="text-center">
+                <div className="text-4xl font-bold text-gradient mb-1">100%</div>
+                <div className="text-sm text-[var(--text-tertiary)] font-mono uppercase tracking-wider">
+                  GDCR Compliant
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl font-bold text-gradient mb-1">500+</div>
+                <div className="text-sm text-[var(--text-tertiary)] font-mono uppercase tracking-wider">
+                  Sites Analyzed
+                </div>
+              </div>
             </div>
-          ))}
+          </div>
+        </div>
+
+        {/* Decorative elements */}
+        <div className="absolute top-1/2 left-0 w-64 h-64 bg-[var(--accent-glow)] rounded-full blur-[100px] -translate-y-1/2 opacity-50" />
+        <div className="absolute top-1/3 right-0 w-96 h-96 bg-[var(--blueprint-subtle)] rounded-full blur-[120px] opacity-40" />
+      </section>
+
+      {/* Features Section */}
+      <section id="features" className="relative section-spacing border-t border-[var(--border-subtle)]">
+        <div className="container-wide">
+          {/* Section header */}
+          <div className="text-center mb-16">
+            <Badge variant="blueprint" className="mb-4">Features</Badge>
+            <h2 className="heading-2 mb-4">
+              Everything You Need for{' '}
+              <span className="text-gradient">Compliance</span>
+            </h2>
+            <p className="body-large max-w-2xl mx-auto">
+              Comprehensive GDCR 2017 analysis with transparent calculations and professional reporting.
+            </p>
+          </div>
+
+          {/* Features grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {features.map((feature, index) => (
+              <FeatureCard
+                key={index}
+                icon={feature.icon}
+                title={feature.title}
+                description={feature.description}
+              />
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 section-spacing relative">
-        <div className="text-center mb-20">
-          <h2 className="heading-md text-slate-900 mb-6">
-            How It <span className="gradient-text">Works</span>
-          </h2>
-          <p className="body-lg text-slate-600 max-w-2xl mx-auto">Simple 3-step process to compliance</p>
+      {/* How It Works Section */}
+      <section id="how-it-works" className="relative section-spacing border-t border-[var(--border-subtle)]">
+        <div className="container-wide">
+          {/* Section header */}
+          <div className="text-center mb-16">
+            <Badge variant="accent" className="mb-4">Process</Badge>
+            <h2 className="heading-2 mb-4">
+              How It <span className="text-gradient">Works</span>
+            </h2>
+            <p className="body-large max-w-2xl mx-auto">
+              Simple four-step process from site data to professional compliance report.
+            </p>
+          </div>
+
+          {/* Steps */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {steps.map((step, index) => (
+              <div key={index} className="relative">
+                {/* Connector line */}
+                {index < steps.length - 1 && (
+                  <div className="hidden lg:block absolute top-8 left-[60%] w-[80%] h-px bg-gradient-to-r from-[var(--border-strong)] to-transparent" />
+                )}
+                <Card variant="default" padding="lg" className="relative">
+                  {/* Step number */}
+                  <div className="absolute -top-3 -left-3 w-8 h-8 rounded-full bg-[var(--accent-primary)] text-[var(--bg-primary)] flex items-center justify-center font-mono text-xs font-bold">
+                    {step.number}
+                  </div>
+                  {/* Icon */}
+                  <div className="w-12 h-12 rounded-[var(--radius-lg)] bg-[var(--bg-hover)] flex items-center justify-center mb-4 text-[var(--text-secondary)]">
+                    {step.icon}
+                  </div>
+                  {/* Content */}
+                  <h3 className="heading-4 mb-2">{step.title}</h3>
+                  <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
+                    {step.description}
+                  </p>
+                </Card>
+              </div>
+            ))}
+          </div>
         </div>
+      </section>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 relative">
-          {/* Connection lines for desktop - More subtle */}
-          <div className="hidden md:block absolute top-28 left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent" style={{ top: '88px' }} />
-
-          <div className="relative text-center group">
-            <div className="w-24 h-24 bg-gradient-to-br from-cyan-600 via-cyan-500 to-cyan-600 rounded-3xl flex items-center justify-center text-white text-4xl font-extrabold mx-auto mb-8 shadow-lg hover:shadow-xl group-hover:shadow-cyan-500/40 group-hover:scale-110 transition-all duration-300">
-              1
-            </div>
-            <div className="glass-card rounded-2xl p-8">
-              <h3 className="text-2xl font-bold text-slate-900 mb-4 tracking-tight">
-                Upload Site Data
-              </h3>
-              <p className="text-slate-600 leading-relaxed text-base">
-                Upload survey drawings or enter plot details manually with our interactive map
-              </p>
-            </div>
+      {/* Testimonials Section */}
+      <section id="testimonials" className="relative section-spacing border-t border-[var(--border-subtle)]">
+        <div className="container-wide">
+          {/* Section header */}
+          <div className="text-center mb-16">
+            <Badge variant="success" className="mb-4">
+              <Star className="w-3.5 h-3.5" />
+              Testimonials
+            </Badge>
+            <h2 className="heading-2 mb-4">
+              Trusted by <span className="text-gradient">Professionals</span>
+            </h2>
+            <p className="body-large max-w-2xl mx-auto">
+              See what architects and developers are saying about LIMIT.
+            </p>
           </div>
 
-          <div className="relative text-center group">
-            <div className="w-24 h-24 bg-gradient-to-br from-indigo-600 via-indigo-500 to-indigo-600 rounded-3xl flex items-center justify-center text-white text-4xl font-extrabold mx-auto mb-8 shadow-lg hover:shadow-xl group-hover:shadow-indigo-500/40 group-hover:scale-110 transition-all duration-300">
-              2
-            </div>
-            <div className="glass-card rounded-2xl p-8">
-              <h3 className="text-2xl font-bold text-slate-900 mb-4 tracking-tight">
-                Review Calculations
-              </h3>
-              <p className="text-slate-600 leading-relaxed text-base">
-                Verify extracted data and see transparent regulation calculations with 3D preview
-              </p>
-            </div>
-          </div>
-
-          <div className="relative text-center group">
-            <div className="w-24 h-24 bg-gradient-to-br from-violet-600 via-violet-500 to-violet-600 rounded-3xl flex items-center justify-center text-white text-4xl font-extrabold mx-auto mb-8 shadow-lg hover:shadow-xl group-hover:shadow-violet-500/40 group-hover:scale-110 transition-all duration-300">
-              3
-            </div>
-            <div className="glass-card rounded-2xl p-8">
-              <h3 className="text-2xl font-bold text-slate-900 mb-4 tracking-tight">
-                Download Report
-              </h3>
-              <p className="text-slate-600 leading-relaxed text-base">
-                Get comprehensive PDF report with all compliance details and calculations
-              </p>
-            </div>
+          {/* Testimonials grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {testimonials.map((testimonial, index) => (
+              <Card key={index} variant="elevated" padding="lg" className="flex flex-col">
+                {/* Stars */}
+                <div className="flex gap-1 mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-4 h-4 fill-[var(--accent-primary)] text-[var(--accent-primary)]" />
+                  ))}
+                </div>
+                {/* Quote */}
+                <blockquote className="text-[var(--text-secondary)] leading-relaxed mb-6 flex-1">
+                  "{testimonial.quote}"
+                </blockquote>
+                {/* Author */}
+                <div className="flex items-center gap-3 pt-4 border-t border-[var(--border-subtle)]">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center text-[var(--bg-primary)] font-bold text-sm">
+                    {testimonial.avatar}
+                  </div>
+                  <div>
+                    <div className="font-medium text-sm">{testimonial.author}</div>
+                    <div className="text-xs text-[var(--text-muted)]">{testimonial.role}</div>
+                  </div>
+                </div>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 section-spacing">
-        <div className="relative overflow-hidden bg-gradient-to-br from-cyan-600 via-indigo-600 to-violet-600 rounded-3xl p-16 md:p-20 text-center text-white shadow-2xl">
-          {/* Decorative elements - More refined */}
-          <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-[28rem] h-[28rem] bg-amber-500/15 rounded-full blur-3xl" />
+      <section className="relative section-spacing border-t border-[var(--border-subtle)]">
+        <div className="container-base">
+          <Card
+            variant="gradient-border"
+            padding="none"
+            className="relative overflow-hidden"
+          >
+            {/* Background gradient */}
+            <div className="absolute inset-0 bg-gradient-to-br from-[var(--accent-primary)]/10 via-transparent to-[var(--blueprint)]/10" />
 
-          <div className="relative z-10">
-            <div className="inline-flex items-center gap-2.5 bg-white/20 backdrop-blur-sm rounded-full px-5 py-2.5 mb-8">
-              <Sparkles className="w-5 h-5" />
-              <span className="text-sm font-bold tracking-wide">Limited Time Offer</span>
-            </div>
+            <div className="relative p-12 md:p-16 text-center">
+              <Badge variant="accent" className="mb-6">
+                <Sparkles className="w-3.5 h-3.5" />
+                Get Started Today
+              </Badge>
 
-            <h2 className="heading-md text-white mb-6">
-              Ready to Streamline Your Compliance?
-            </h2>
-            <p className="body-lg text-white/95 mb-12 max-w-2xl mx-auto">
-              Join 500+ architects and developers already using LIMIT
-            </p>
+              <h2 className="heading-2 mb-4">
+                Ready to Streamline Your{' '}
+                <span className="text-gradient">Compliance Workflow?</span>
+              </h2>
 
-            <div className="flex items-center justify-center gap-5 flex-wrap mb-12">
-              <Button
-                size="lg"
-                variant="secondary"
-                onClick={() => router.push('/register')}
-                className="bg-white text-cyan-600 hover:bg-slate-50 shadow-xl hover:shadow-2xl"
-              >
-                Start Free Trial
-              </Button>
-              <Button
-                size="lg"
-                variant="ghost"
-                onClick={() => router.push('/login')}
-                className="border-2 border-white/80 hover:bg-white/10 text-white"
-              >
-                Sign In
-              </Button>
-            </div>
+              <p className="body-large max-w-xl mx-auto mb-8">
+                Join architects and developers already using LIMIT for faster, more accurate GDCR compliance analysis.
+              </p>
 
-            <div className="flex items-center justify-center gap-10 text-base font-medium">
-              <div className="flex items-center gap-2.5">
-                <TrendingUp className="w-5 h-5" />
-                <span>No credit card required</span>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
+                <Button variant="primary" size="lg" onClick={() => router.push('/register')}>
+                  Start Free Trial
+                  <ArrowRight className="w-5 h-5" />
+                </Button>
+                <Button variant="secondary" size="lg" onClick={() => router.push('/login')}>
+                  Sign In
+                </Button>
               </div>
-              <div className="flex items-center gap-2.5">
-                <Users className="w-5 h-5" />
-                <span>500+ users</span>
+
+              {/* Trust indicators */}
+              <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-[var(--text-tertiary)]">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-[var(--success)]" />
+                  No credit card required
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-[var(--success)]" />
+                  5 free analyses
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-[var(--success)]" />
+                  Cancel anytime
+                </div>
               </div>
             </div>
-          </div>
+          </Card>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-slate-200/60 glass mt-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-cyan-600 via-cyan-500 to-cyan-600 rounded-2xl flex items-center justify-center shadow-lg hover:shadow-xl hover:shadow-cyan-500/30 transition-all">
-                <Building2 className="w-7 h-7 text-white" />
+      <footer className="relative border-t border-[var(--border-subtle)] py-12">
+        <div className="container-wide">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            {/* Logo */}
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-[var(--radius-md)] bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center">
+                <Building2 className="w-4 h-4 text-[var(--bg-primary)]" />
               </div>
-              <span className="text-3xl font-extrabold gradient-text">LIMIT</span>
+              <span className="font-bold">LIMIT</span>
+              <span className="text-[var(--text-muted)] text-sm">|</span>
+              <span className="text-[var(--text-muted)] text-sm">Building Compliance Platform</span>
             </div>
-            <p className="text-slate-700 mb-2 font-semibold text-lg">
-              Building Regulation Compliance Platform
-            </p>
-            <p className="text-sm text-slate-600 mb-8 font-medium">
-              GDCR 2017 Compliance for Gujarat/Ahmedabad
-            </p>
-            <div className="glass-card rounded-2xl p-6 max-w-3xl mx-auto border border-slate-200/60">
-              <p className="text-sm text-slate-600 leading-relaxed">
-                <strong className="text-slate-800">Disclaimer:</strong> This is an advisory tool only. All calculations and reports should be verified with local authorities and licensed professionals before proceeding with construction. LIMIT does not replace professional architectural or engineering services.
-              </p>
+
+            {/* Links */}
+            <div className="flex items-center gap-6 text-sm text-[var(--text-secondary)]">
+              <a href="#" className="hover:text-[var(--text-primary)] transition-colors">Privacy</a>
+              <a href="#" className="hover:text-[var(--text-primary)] transition-colors">Terms</a>
+              <a href="#" className="hover:text-[var(--text-primary)] transition-colors">Contact</a>
             </div>
-            <p className="text-xs text-slate-500 mt-8 font-medium">
+
+            {/* Copyright */}
+            <div className="text-sm text-[var(--text-muted)]">
               © 2026 LIMIT. All rights reserved.
+            </div>
+          </div>
+
+          {/* Disclaimer */}
+          <div className="mt-8 pt-6 border-t border-[var(--border-subtle)]">
+            <p className="text-xs text-[var(--text-muted)] text-center max-w-3xl mx-auto leading-relaxed">
+              <strong className="text-[var(--text-tertiary)]">Disclaimer:</strong> LIMIT is an advisory tool only.
+              All calculations and reports should be verified with local authorities and licensed professionals
+              before proceeding with construction. This platform does not replace professional architectural
+              or engineering services.
             </p>
           </div>
         </div>

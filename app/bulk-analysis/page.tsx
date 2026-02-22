@@ -264,7 +264,7 @@ export default function BulkAnalysisPage() {
                   onClick={handleProcess}
                   fullWidth
                   size="lg"
-                  variant="gradient"
+                  variant="primary"
                   isLoading={isProcessing}
                   disabled={!csvFile || isProcessing}
                 >

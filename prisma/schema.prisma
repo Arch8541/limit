@@ -1,15 +1,19 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// Prisma Schema for LIMIT Platform - AWS RDS PostgreSQL Optimized
+// Version: 2.0.0 - Production Ready
 
 generator client {
-  provider = "prisma-client-js"
-  output   = "../node_modules/.prisma/client"
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+// ============================================================================
+// USER & AUTHENTICATION MODELS
+// ============================================================================
 
 model User {
   id            String    @id @default(cuid())
@@ -18,11 +22,19 @@ model User {
   name          String?
   password      String?
   image         String?
+
+  // Relationships
   projects      Project[]
   accounts      Account[]
   sessions      Session[]
+
+  // Timestamps
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+
+  // Indexes
+  @@index([email])
+  @@index([createdAt])
 }
 
 model Account {
@@ -31,12 +43,12 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String?
-  access_token      String?
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String?
+  id_token          String? @db.Text
   session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -50,9 +62,11 @@ model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
+
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([expires])
 }
 
 model VerificationToken {
@@ -61,46 +75,62 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+  @@index([expires])
 }
+
+// ============================================================================
+// PROJECT MODEL - Core Business Entity
+// ============================================================================
 
 model Project {
   id               String   @id @default(cuid())
   userId           String
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  name             String
-  address          String?
+  // Basic Info
+  name             String   @db.VarChar(200)
+  address          String?  @db.VarChar(500)
   latitude         Float?
   longitude        Float?
 
-  authority        String
-  zone             String
+  // Regulatory Classification
+  authority        String   @db.VarChar(50)
+  zone             String   @db.VarChar(50)
 
+  // Plot Dimensions
   plotLength       Float
   plotWidth        Float
   plotArea         Float
-  boundaryCoordinates String?  // JSON string for irregular plot coordinates
+  boundaryCoordinates String?  // JSON string for polygon coordinates
 
+  // Site Conditions
   isCornerPlot     Boolean  @default(false)
   roadWidthPrimary Float
   roadWidthSecondary Float?
 
-  intendedUse      String
+  // Usage & Special Conditions
+  intendedUse      String   @db.VarChar(100)
   heritage         Boolean  @default(false)
-  toz              Boolean  @default(false)
-  sez              Boolean  @default(false)
+  toz              Boolean  @default(false)  // Traffic Optimization Zone
+  sez              Boolean  @default(false)  // Special Economic Zone
 
-  regulationResult String?  // JSON string
-  gdcrClauses      String?  // JSON string
-  extractedData    String?  // JSON string
+  // Calculation Results (JSON strings)
+  regulationResult String?  // GDCR calculation results
+  gdcrClauses      String?  // Applicable GDCR clauses
+  extractedData    String?  // AI-extracted drawing data
 
-  reportId         String?
-  status           String   @default("draft")
-  thumbnail        String?
+  // Status & Metadata
+  reportId         String?  @db.VarChar(100)
+  status           String   @default("draft")  // draft, processing, completed, error
+  thumbnail        String?  @db.Text
 
+  // Timestamps
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  @@index([userId])
+  // Composite Indexes for Performance
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([userId, status])
   @@index([status])
+  @@index([authority, zone])
 }

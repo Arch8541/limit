@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // Parse JSON fields
+    // Parse JSON fields and convert to app format
     const projectsWithParsedData = dbProjects.map(project => {
       const parsed = {
         ...project,

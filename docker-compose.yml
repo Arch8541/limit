@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database (Local Development)
+  postgres:
+    image: postgres:15-alpine
+    container_name: limit-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: limit_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # LIMIT Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: limit-app
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/limit_dev
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=dev-secret-change-in-production
+      - JWT_SECRET=dev-jwt-secret-change-in-production
+      - NODE_ENV=development
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    command: npm run dev
+
+  # Redis Cache (Optional - for session storage)
+  redis:
+    image: redis:7-alpine
+    container_name: limit-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  redis_data:

@@ -3,12 +3,13 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
+import Link from 'next/link';
 import { getUserProjects, deleteProject } from '@/lib/storage/projects-api';
 import { Project } from '@/types';
 import { Button } from '@/components/ui/Button';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
-import { Input } from '@/components/ui/Input';
-import { Badge } from '@/components/ui/Badge';
+import { Card, CardHeader, CardTitle, CardContent, StatCard } from '@/components/ui/Card';
+import { Input, SearchInput } from '@/components/ui/Input';
+import { Badge, StatusBadge } from '@/components/ui/Badge';
 import {
   Building2,
   Plus,
@@ -18,7 +19,15 @@ import {
   FileText,
   Trash2,
   LogOut,
-  Upload
+  Upload,
+  MoreVertical,
+  ArrowRight,
+  FolderOpen,
+  BarChart3,
+  TrendingUp,
+  Clock,
+  ChevronRight,
+  Ruler,
 } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -78,8 +87,9 @@ export default function DashboardPage() {
     router.push(path);
   };
 
-  const handleDelete = async (projectId: string) => {
-    if (confirm('Are you sure you want to delete this project?')) {
+  const handleDelete = async (e: React.MouseEvent, projectId: string) => {
+    e.stopPropagation();
+    if (confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
       setDeletingProjectId(projectId);
       try {
         await deleteProject(projectId);
@@ -105,27 +115,19 @@ export default function DashboardPage() {
     }
   };
 
-  const getStatusColor = (status: Project['status']) => {
-    switch (status) {
-      case 'completed':
-        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
-      case 'processing':
-        return 'bg-cyan-50 text-cyan-700 border-cyan-200';
-      case 'error':
-        return 'bg-rose-50 text-rose-700 border-rose-200';
-      default:
-        return 'bg-slate-50 text-slate-700 border-slate-200';
-    }
-  };
+  // Stats calculations
+  const completedProjects = projects.filter((p) => p.status === 'completed').length;
+  const draftProjects = projects.filter((p) => p.status === 'draft').length;
+  const totalArea = projects.reduce((sum, p) => sum + (p.siteData.plotDimensions?.area || 0), 0);
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen gradient-mesh flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 bg-gradient-to-br from-cyan-600 via-cyan-500 to-cyan-600 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
-            <Building2 className="w-10 h-10 text-white" />
+          <div className="w-16 h-16 rounded-[var(--radius-xl)] bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <Building2 className="w-8 h-8 text-[var(--bg-primary)]" />
           </div>
-          <p className="text-slate-600 font-medium">Loading...</p>
+          <p className="text-[var(--text-secondary)]">Loading your workspace...</p>
         </div>
       </div>
     );
@@ -138,28 +140,62 @@ export default function DashboardPage() {
   const user = session.user;
 
   return (
-    <div className="min-h-screen gradient-mesh">
+    <div className="min-h-screen bg-[var(--bg-primary)]">
+      {/* Ambient background */}
+      <div className="fixed inset-0 bg-gradient-mesh pointer-events-none opacity-50" />
+
       {/* Header */}
-      <header className="border-b border-slate-200/60 glass sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+      <header className="relative z-50 border-b border-[var(--border-subtle)] bg-[var(--bg-primary)]/80 backdrop-blur-xl sticky top-0">
+        <div className="container-full py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-cyan-600 via-cyan-500 to-cyan-600 rounded-xl flex items-center justify-center shadow-md hover:shadow-lg hover:shadow-cyan-500/30 transition-all">
-                <Building2 className="w-7 h-7 text-white" />
-              </div>
-              <div>
-                <span className="text-2xl font-extrabold gradient-text tracking-tight">LIMIT</span>
-                <p className="text-xs text-slate-600 font-semibold tracking-wide">Building Compliance</p>
-              </div>
+            {/* Logo & Nav */}
+            <div className="flex items-center gap-8">
+              <Link href="/dashboard" className="flex items-center gap-3 group">
+                <div className="w-10 h-10 rounded-[var(--radius-lg)] bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
+                  <Building2 className="w-5 h-5 text-[var(--bg-primary)]" />
+                </div>
+                <span className="text-xl font-bold tracking-tight hidden sm:block">LIMIT</span>
+              </Link>
+
+              {/* Nav links */}
+              <nav className="hidden md:flex items-center gap-1">
+                <Link
+                  href="/dashboard"
+                  className="px-4 py-2 text-sm font-medium text-[var(--text-primary)] bg-[var(--bg-hover)] rounded-[var(--radius-md)]"
+                >
+                  Projects
+                </Link>
+                <Link
+                  href="/bulk-analysis"
+                  className="px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-[var(--radius-md)] transition-colors"
+                >
+                  Bulk Analysis
+                </Link>
+              </nav>
             </div>
-            <div className="flex items-center space-x-5">
+
+            {/* User section */}
+            <div className="flex items-center gap-4">
+              {/* User info */}
               <div className="hidden sm:block text-right">
-                <p className="text-sm font-bold text-slate-900">{user?.name}</p>
-                <p className="text-xs text-slate-600 font-medium">{user?.email}</p>
+                <p className="text-sm font-medium text-[var(--text-primary)]">{user?.name}</p>
+                <p className="text-xs text-[var(--text-muted)]">{user?.email}</p>
               </div>
-              <Button variant="ghost" size="sm" onClick={handleLogout} isLoading={isLoggingOut} disabled={isLoggingOut}>
-                {!isLoggingOut && <LogOut className="w-4 h-4 mr-2" />}
-                {isLoggingOut ? 'Logging out...' : 'Logout'}
+
+              {/* User avatar */}
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center text-[var(--bg-primary)] font-bold text-sm">
+                {user?.name?.charAt(0) || user?.email?.charAt(0) || 'U'}
+              </div>
+
+              {/* Logout */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLogout}
+                isLoading={isLoggingOut}
+              >
+                <LogOut className="w-4 h-4" />
+                <span className="hidden sm:inline">Sign Out</span>
               </Button>
             </div>
           </div>
@@ -167,176 +203,201 @@ export default function DashboardPage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        {/* Action Bar */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-10">
+      <main className="relative container-full py-8">
+        {/* Page header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
           <div>
-            <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight">My Projects</h1>
-            <p className="text-slate-600 mt-2 text-base font-medium">
-              {projects.length} {projects.length === 1 ? 'project' : 'projects'} total
+            <Badge variant="accent" className="mb-3">Dashboard</Badge>
+            <h1 className="heading-2 text-[var(--text-primary)] mb-2">Your Projects</h1>
+            <p className="text-[var(--text-secondary)]">
+              Manage and analyze your building compliance projects.
             </p>
           </div>
-          <div className="flex gap-4 w-full sm:w-auto">
+
+          <div className="flex items-center gap-3">
             <Button
               variant="secondary"
               onClick={() => handleNavigation('/bulk-analysis')}
               isLoading={navigatingTo === '/bulk-analysis'}
-              disabled={navigatingTo !== null}
             >
-              {navigatingTo !== '/bulk-analysis' && <Upload className="w-4 h-4 mr-2" />}
-              Bulk Analysis
+              <Upload className="w-4 h-4" />
+              Bulk Import
             </Button>
             <Button
+              variant="primary"
               onClick={() => handleNavigation('/projects/new')}
               isLoading={navigatingTo === '/projects/new'}
-              disabled={navigatingTo !== null}
             >
-              {navigatingTo !== '/projects/new' && <Plus className="w-4 h-4 mr-2" />}
+              <Plus className="w-4 h-4" />
               New Project
             </Button>
           </div>
         </div>
 
-        {/* Search Bar */}
-        <div className="mb-8">
-          <Input
-            type="text"
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <StatCard
+            label="Total Projects"
+            value={projects.length}
+            icon={<FolderOpen className="w-full h-full" />}
+          />
+          <StatCard
+            label="Completed"
+            value={completedProjects}
+            icon={<BarChart3 className="w-full h-full" />}
+          />
+          <StatCard
+            label="In Progress"
+            value={draftProjects}
+            icon={<Clock className="w-full h-full" />}
+          />
+          <StatCard
+            label="Total Area"
+            value={`${totalArea.toLocaleString()} m²`}
+            icon={<Ruler className="w-full h-full" />}
+          />
+        </div>
+
+        {/* Search & Filters */}
+        <div className="mb-6">
+          <SearchInput
             placeholder="Search projects by name, address, or zone..."
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
-            icon={<Search className="w-5 h-5" />}
           />
         </div>
 
         {/* Projects Grid */}
         {isLoadingProjects ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-cyan-600 via-cyan-500 to-cyan-600 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
-                <Building2 className="w-10 h-10 text-white" />
-              </div>
-              <p className="text-slate-600 font-medium">Loading projects...</p>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, i) => (
+              <Card key={i} variant="default" padding="lg">
+                <div className="animate-shimmer h-4 w-3/4 rounded mb-4" />
+                <div className="animate-shimmer h-3 w-1/2 rounded mb-6" />
+                <div className="space-y-3">
+                  <div className="animate-shimmer h-3 w-full rounded" />
+                  <div className="animate-shimmer h-3 w-2/3 rounded" />
+                </div>
+              </Card>
+            ))}
           </div>
         ) : filteredProjects.length === 0 ? (
-          <Card glass className="border border-slate-200/60">
-            <CardContent className="py-20 text-center">
-              <div className="w-20 h-20 bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Building2 className="w-10 h-10 text-slate-400" />
-              </div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">
-                {searchQuery ? 'No projects found' : 'No projects yet'}
-              </h3>
-              <p className="text-slate-600 mb-8 text-base leading-relaxed max-w-md mx-auto">
-                {searchQuery
-                  ? 'Try adjusting your search query'
-                  : 'Create your first project to start analyzing building regulations'}
-              </p>
-              {!searchQuery && (
-                <Button
-                  onClick={() => handleNavigation('/projects/new')}
-                  isLoading={navigatingTo === '/projects/new'}
-                  disabled={navigatingTo !== null}
-                >
-                  {navigatingTo !== '/projects/new' && <Plus className="w-4 h-4 mr-2" />}
-                  Create First Project
-                </Button>
-              )}
-            </CardContent>
+          <Card variant="elevated" padding="lg" className="text-center py-16">
+            <div className="w-20 h-20 rounded-[var(--radius-xl)] bg-[var(--bg-hover)] flex items-center justify-center mx-auto mb-6">
+              <FolderOpen className="w-10 h-10 text-[var(--text-muted)]" />
+            </div>
+            <h3 className="heading-3 text-[var(--text-primary)] mb-2">
+              {searchQuery ? 'No projects found' : 'No projects yet'}
+            </h3>
+            <p className="text-[var(--text-secondary)] mb-8 max-w-md mx-auto">
+              {searchQuery
+                ? 'Try adjusting your search query to find what you\'re looking for.'
+                : 'Create your first project to start analyzing building regulations.'}
+            </p>
+            {!searchQuery && (
+              <Button
+                variant="primary"
+                onClick={() => handleNavigation('/projects/new')}
+                isLoading={navigatingTo === '/projects/new'}
+              >
+                <Plus className="w-4 h-4" />
+                Create First Project
+              </Button>
+            )}
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProjects.map((project) => (
               <Card
                 key={project.id}
+                variant="default"
+                padding="none"
                 hover
-                glass
-                className={`cursor-pointer border border-slate-200/60 ${navigatingTo === `/projects/${project.id}` ? 'opacity-50' : ''}`}
+                className={`overflow-hidden ${
+                  navigatingTo === `/projects/${project.id}` ? 'opacity-50' : ''
+                }`}
                 onClick={() => handleNavigation(`/projects/${project.id}`)}
               >
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="text-xl mb-3">
+                {/* Card Header */}
+                <div className="p-6 pb-4">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-[var(--text-primary)] truncate mb-1">
                         {project.siteData.projectName}
-                      </CardTitle>
-                      <Badge className={getStatusColor(project.status)}>
-                        {project.status}
-                      </Badge>
+                      </h3>
+                      <StatusBadge status={project.status} />
+                    </div>
+                    <button
+                      onClick={(e) => handleDelete(e, project.id)}
+                      disabled={deletingProjectId === project.id}
+                      className="p-2 rounded-[var(--radius-md)] hover:bg-[var(--bg-hover)] text-[var(--text-muted)] hover:text-[var(--error)] transition-colors"
+                    >
+                      {deletingProjectId === project.id ? (
+                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <Trash2 className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Address */}
+                  <div className="flex items-start gap-2 text-sm text-[var(--text-secondary)] mb-4">
+                    <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5 text-[var(--text-muted)]" />
+                    <span className="line-clamp-2">{project.siteData.address || 'No address specified'}</span>
+                  </div>
+
+                  {/* Details */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="p-3 rounded-[var(--radius-md)] bg-[var(--bg-tertiary)]">
+                      <div className="text-xs text-[var(--text-muted)] font-mono uppercase tracking-wider mb-1">Zone</div>
+                      <div className="font-medium text-sm text-[var(--text-primary)]">{project.siteData.zone}</div>
+                    </div>
+                    <div className="p-3 rounded-[var(--radius-md)] bg-[var(--bg-tertiary)]">
+                      <div className="text-xs text-[var(--text-muted)] font-mono uppercase tracking-wider mb-1">Area</div>
+                      <div className="font-medium text-sm text-[var(--text-primary)]">
+                        {project.siteData.plotDimensions?.area?.toFixed(0) || '—'} m²
+                      </div>
                     </div>
                   </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-start text-sm text-slate-600">
-                      <MapPin className="w-4 h-4 mr-2.5 mt-0.5 flex-shrink-0 text-slate-500" />
-                      <span className="line-clamp-2 leading-relaxed">{project.siteData.address}</span>
-                    </div>
 
-                    <div className="flex items-center justify-between text-sm py-2.5 px-3 bg-slate-50/80 rounded-lg">
-                      <span className="text-slate-600 font-medium">Zone:</span>
-                      <span className="font-bold text-slate-900">
-                        {project.siteData.zone}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center justify-between text-sm py-2.5 px-3 bg-slate-50/80 rounded-lg">
-                      <span className="text-slate-600 font-medium">Plot Area:</span>
-                      <span className="font-bold text-slate-900">
-                        {project.siteData.plotDimensions.area.toFixed(2)} sq.m
-                      </span>
-                    </div>
-
-                    {project.regulationResult && (
-                      <div className="flex items-center justify-between text-sm py-2.5 px-3 bg-cyan-50/80 rounded-lg border border-cyan-200/60">
-                        <span className="text-cyan-700 font-medium">Max FSI:</span>
-                        <span className="font-bold text-cyan-700">
-                          {project.regulationResult.fsi.total.toFixed(2)}
+                  {/* FSI if available */}
+                  {project.regulationResult && (
+                    <div className="mt-3 p-3 rounded-[var(--radius-md)] bg-[var(--accent-subtle)] border border-[var(--accent-primary)]/20">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-[var(--accent-primary)] font-mono uppercase tracking-wider">Max FSI</span>
+                        <span className="font-bold text-[var(--accent-primary)]">
+                          {project.regulationResult.fsi?.total?.toFixed(2) || '—'}
                         </span>
                       </div>
-                    )}
-
-                    <div className="flex items-center text-xs text-slate-500 pt-3 border-t border-slate-200 font-medium">
-                      <Calendar className="w-3.5 h-3.5 mr-1.5" />
-                      {new Date(project.createdAt).toLocaleDateString()}
                     </div>
+                  )}
+                </div>
+
+                {/* Card Footer */}
+                <div className="px-6 py-4 border-t border-[var(--border-subtle)] bg-[var(--bg-tertiary)]/50 flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
+                    <Calendar className="w-3.5 h-3.5" />
+                    {new Date(project.createdAt).toLocaleDateString()}
                   </div>
 
-                  <div className="flex gap-3 mt-5 pt-5 border-t border-slate-200">
+                  <div className="flex items-center gap-2">
                     {project.regulationResult && (
                       <Button
+                        variant="ghost"
                         size="sm"
-                        variant="secondary"
-                        fullWidth
                         onClick={(e) => {
                           e.stopPropagation();
                           handleNavigation(`/projects/${project.id}/report`);
                         }}
                         isLoading={navigatingTo === `/projects/${project.id}/report`}
-                        disabled={navigatingTo !== null}
                       >
-                        {navigatingTo !== `/projects/${project.id}/report` && <FileText className="w-4 h-4 mr-2" />}
+                        <FileText className="w-4 h-4" />
                         Report
                       </Button>
                     )}
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDelete(project.id);
-                      }}
-                      isLoading={deletingProjectId === project.id}
-                      disabled={deletingProjectId === project.id}
-                    >
-                      {deletingProjectId === project.id ? (
-                        <span className="text-xs">Deleting...</span>
-                      ) : (
-                        <Trash2 className="w-4 h-4" />
-                      )}
-                    </Button>
+                    <ChevronRight className="w-4 h-4 text-[var(--text-muted)]" />
                   </div>
-                </CardContent>
+                </div>
               </Card>
             ))}
           </div>

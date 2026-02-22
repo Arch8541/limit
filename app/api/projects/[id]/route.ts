@@ -69,7 +69,7 @@ const updateProjectSchema = z.object({
   heritage: z.boolean().optional(),
   toz: z.boolean().optional(),
   sez: z.boolean().optional(),
-  status: z.string().optional(),
+  status: z.enum(['draft', 'processing', 'completed', 'error']).optional(),
   reportId: z.string().optional(),
   thumbnail: z.string().optional(),
   regulationResult: z.any().optional(),
@@ -116,7 +116,7 @@ export async function PUT(
     }
 
     // Prepare update data
-    const updateData: any = {};
+    const updateData: Record<string, unknown> = {};
 
     if (data.name !== undefined) updateData.name = data.name;
     if (data.address !== undefined) updateData.address = data.address;
@@ -138,7 +138,7 @@ export async function PUT(
     if (data.reportId !== undefined) updateData.reportId = data.reportId;
     if (data.thumbnail !== undefined) updateData.thumbnail = data.thumbnail;
 
-    // Handle JSON fields
+    // Handle JSON fields - stringify for storage
     if (data.boundaryCoordinates !== undefined) {
       updateData.boundaryCoordinates = data.boundaryCoordinates ? JSON.stringify(data.boundaryCoordinates) : null;
     }
@@ -157,7 +157,7 @@ export async function PUT(
       data: updateData,
     });
 
-    // Parse JSON fields for response and convert to app format
+    // Parse JSON fields for response
     const parsed = {
       ...project,
       boundaryCoordinates: project.boundaryCoordinates ? JSON.parse(project.boundaryCoordinates) : null,
