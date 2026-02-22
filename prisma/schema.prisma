@@ -2,8 +2,7 @@
 // Version: 2.0.0 - Production Ready
 
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["fullTextSearch"]
+  provider = "prisma-client-js"
 }
 
 datasource db {

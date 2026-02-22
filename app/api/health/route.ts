@@ -1,35 +1,38 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/db/prisma';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const health = {
+  const health: {
+    status: string;
+    timestamp: string;
+    checks: {
+      database: string;
+      env: string;
+    };
+    error?: string;
+  } = {
     status: 'ok',
     timestamp: new Date().toISOString(),
-    version: process.env.npm_package_version || '1.0.0',
-    uptime: process.uptime(),
     checks: {
       database: 'unknown',
-      memory: 'ok',
+      env: 'unknown',
     },
   };
 
+  // Check environment variables
+  health.checks.env = process.env.DATABASE_URL ? 'ok' : 'missing DATABASE_URL';
+
   try {
-    // Check database connection
+    // Dynamic import to catch any Prisma initialization errors
+    const { prisma } = await import('@/lib/db/prisma');
     await prisma.$queryRaw`SELECT 1`;
     health.checks.database = 'ok';
   } catch (error) {
-    health.status = 'degraded';
+    health.status = 'error';
     health.checks.database = 'error';
+    health.error = error instanceof Error ? error.message : 'Unknown database error';
     console.error('Health check - Database error:', error);
-  }
-
-  // Check memory usage
-  const memUsage = process.memoryUsage();
-  const heapUsedMB = memUsage.heapUsed / 1024 / 1024;
-  if (heapUsedMB > 450) {
-    health.checks.memory = 'warning';
   }
 
   const statusCode = health.status === 'ok' ? 200 : 503;
