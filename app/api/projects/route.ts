@@ -6,11 +6,22 @@ import { z } from 'zod';
 
 export async function GET(request: NextRequest) {
   try {
+    console.log('GET /api/projects - Starting request');
+
+    // Check environment
+    if (!process.env.DATABASE_URL) {
+      console.error('DATABASE_URL is not set');
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+    }
+
     const session = await auth();
+    console.log('Session:', session ? 'authenticated' : 'not authenticated');
+
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     const userId = session.user.id;
+    console.log('User ID:', userId);
 
     const dbProjects = await prisma.project.findMany({
       where: { userId },
@@ -62,8 +73,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ projects: projectsWithParsedData });
   } catch (error) {
     console.error('Get projects error:', error);
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack');
+    console.error('Error name:', error instanceof Error ? error.name : 'Unknown');
+
+    // Return more specific error for debugging
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { error: 'Failed to fetch projects. Please try again later.' },
+      { error: 'Failed to fetch projects. Please try again later.', details: errorMessage },
       { status: 500 }
     );
   }
@@ -95,11 +111,22 @@ const createProjectSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('POST /api/projects - Starting request');
+
+    // Check environment
+    if (!process.env.DATABASE_URL) {
+      console.error('DATABASE_URL is not set');
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+    }
+
     const session = await auth();
+    console.log('Session:', session ? 'authenticated' : 'not authenticated');
+
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     const userId = session.user.id;
+    console.log('User ID:', userId);
 
     const body = await request.json();
 
@@ -142,8 +169,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ project }, { status: 201 });
   } catch (error) {
     console.error('Create project error:', error);
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack');
+    console.error('Error name:', error instanceof Error ? error.name : 'Unknown');
+
+    // Return more specific error for debugging
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { error: 'Failed to create project. Please check your input and try again.' },
+      { error: 'Failed to create project. Please check your input and try again.', details: errorMessage },
       { status: 500 }
     );
   }
