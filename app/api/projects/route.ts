@@ -88,9 +88,9 @@ export async function GET(request: NextRequest) {
 // Validation schema for project creation
 const createProjectSchema = z.object({
   name: z.string().min(1, 'Project name is required').max(200, 'Project name is too long'),
-  address: z.string().optional(),
-  latitude: z.number().optional(),
-  longitude: z.number().optional(),
+  address: z.string().optional().nullable(),
+  latitude: z.number().optional().nullable(),
+  longitude: z.number().optional().nullable(),
   authority: z.string().min(1, 'Authority is required'),
   zone: z.string().min(1, 'Zone is required'),
   plotLength: z.number().positive('Plot length must be positive'),
@@ -99,14 +99,14 @@ const createProjectSchema = z.object({
   boundaryCoordinates: z.array(z.object({
     x: z.number(),
     y: z.number()
-  })).optional(),
-  isCornerPlot: z.boolean().optional(),
+  })).optional().nullable(),
+  isCornerPlot: z.boolean().optional().default(false),
   roadWidthPrimary: z.number().positive('Primary road width must be positive'),
-  roadWidthSecondary: z.number().positive().optional(),
+  roadWidthSecondary: z.number().positive().optional().nullable(),
   intendedUse: z.string().min(1, 'Intended use is required'),
-  heritage: z.boolean().optional(),
-  toz: z.boolean().optional(),
-  sez: z.boolean().optional(),
+  heritage: z.boolean().optional().default(false),
+  toz: z.boolean().optional().default(false),
+  sez: z.boolean().optional().default(false),
 });
 
 export async function POST(request: NextRequest) {
@@ -129,42 +129,47 @@ export async function POST(request: NextRequest) {
     console.log('User ID:', userId);
 
     const body = await request.json();
+    console.log('Received body keys:', Object.keys(body));
 
     // Validate input
     const validation = createProjectSchema.safeParse(body);
     if (!validation.success) {
+      console.log('Validation errors:', JSON.stringify(validation.error.issues));
       const firstError = validation.error.issues[0];
       return NextResponse.json(
-        { error: firstError?.message || 'Invalid input' },
+        { error: firstError?.message || 'Invalid input', validationErrors: validation.error.issues },
         { status: 400 }
       );
     }
+    console.log('Validation passed');
 
     const data = validation.data;
 
+    console.log('Creating project in database...');
     const project = await prisma.project.create({
       data: {
         userId,
         name: data.name,
-        address: data.address,
-        latitude: data.latitude,
-        longitude: data.longitude,
+        address: data.address || null,
+        latitude: data.latitude || null,
+        longitude: data.longitude || null,
         authority: data.authority,
         zone: data.zone,
         plotLength: data.plotLength,
         plotWidth: data.plotWidth,
         plotArea: data.plotArea,
         boundaryCoordinates: data.boundaryCoordinates ? JSON.stringify(data.boundaryCoordinates) : null,
-        isCornerPlot: data.isCornerPlot || false,
+        isCornerPlot: data.isCornerPlot ?? false,
         roadWidthPrimary: data.roadWidthPrimary,
-        roadWidthSecondary: data.roadWidthSecondary,
+        roadWidthSecondary: data.roadWidthSecondary || null,
         intendedUse: data.intendedUse,
-        heritage: data.heritage || false,
-        toz: data.toz || false,
-        sez: data.sez || false,
+        heritage: data.heritage ?? false,
+        toz: data.toz ?? false,
+        sez: data.sez ?? false,
         status: 'draft',
       },
     });
+    console.log('Project created:', project.id);
 
     return NextResponse.json({ project }, { status: 201 });
   } catch (error) {
