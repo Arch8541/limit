@@ -192,7 +192,7 @@ export default function NewProjectPage() {
             >
               {/* Basic Information */}
               <div className="space-y-5">
-                <h3 className="font-bold text-xl text-slate-900 tracking-tight">Project Details</h3>
+                <h3 className="font-bold text-xl text-[var(--text-primary)] tracking-tight">Project Details</h3>
 
                 <Input
                   label="Project Name"
@@ -213,7 +213,7 @@ export default function NewProjectPage() {
                 />
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">Plot Location</label>
+                  <label className="text-sm font-medium text-[var(--text-secondary)]">Plot Location</label>
                   <MapPicker
                     value={location}
                     onChange={(loc) => {
@@ -256,11 +256,11 @@ export default function NewProjectPage() {
 
               {/* Plot Dimensions */}
               <div className="space-y-5 pt-6 border-t border-slate-200">
-                <h3 className="font-bold text-xl text-slate-900 tracking-tight">Plot Dimensions</h3>
+                <h3 className="font-bold text-xl text-[var(--text-primary)] tracking-tight">Plot Dimensions</h3>
 
                 {/* Plot Type Toggle */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">Plot Shape</label>
+                  <label className="text-sm font-medium text-[var(--text-secondary)]">Plot Shape</label>
                   <div className="inline-flex rounded-lg border border-gray-300 p-1 bg-gray-50">
                     <button
                       type="button"
@@ -268,7 +268,7 @@ export default function NewProjectPage() {
                       className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
                         plotType === 'rectangular'
                           ? 'bg-white text-cyan-700 shadow-sm border border-gray-200'
-                          : 'text-gray-600 hover:text-gray-900'
+                          : 'text-[var(--text-tertiary)] hover:text-[var(--text-primary)]'
                       }`}
                     >
                       Rectangular Plot
@@ -279,7 +279,7 @@ export default function NewProjectPage() {
                       className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
                         plotType === 'irregular'
                           ? 'bg-white text-cyan-700 shadow-sm border border-gray-200'
-                          : 'text-gray-600 hover:text-gray-900'
+                          : 'text-[var(--text-tertiary)] hover:text-[var(--text-primary)]'
                       }`}
                     >
                       Irregular Site Boundary
@@ -326,10 +326,10 @@ export default function NewProjectPage() {
                 {plotType === 'irregular' && (
                   <>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">
+                      <label className="text-sm font-medium text-[var(--text-secondary)]">
                         Draw Site Boundary
                       </label>
-                      <p className="text-xs text-gray-600">
+                      <p className="text-xs text-[var(--text-tertiary)]">
                         Use the polygon drawing tool on the map to trace your site boundary
                       </p>
                     </div>
@@ -375,7 +375,7 @@ export default function NewProjectPage() {
                     onChange={(e) => setIsCornerPlot(e.target.checked)}
                     className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                   />
-                  <label htmlFor="cornerPlot" className="text-sm text-gray-700">
+                  <label htmlFor="cornerPlot" className="text-sm text-[var(--text-secondary)]">
                     Corner Plot (eligible for FSI bonus)
                   </label>
                 </div>
@@ -383,7 +383,7 @@ export default function NewProjectPage() {
 
               {/* Road Widths */}
               <div className="space-y-5 pt-6 border-t border-slate-200">
-                <h3 className="font-bold text-xl text-slate-900 tracking-tight">Road Information</h3>
+                <h3 className="font-bold text-xl text-[var(--text-primary)] tracking-tight">Road Information</h3>
 
                 <Input
                   label="Primary Road Width (m)"
@@ -411,7 +411,7 @@ export default function NewProjectPage() {
 
               {/* Intended Use */}
               <div className="space-y-5 pt-6 border-t border-slate-200">
-                <h3 className="font-bold text-xl text-slate-900 tracking-tight">Intended Use</h3>
+                <h3 className="font-bold text-xl text-[var(--text-primary)] tracking-tight">Intended Use</h3>
 
                 <Select
                   label="Building Use Type"
@@ -430,7 +430,7 @@ export default function NewProjectPage() {
 
               {/* Survey Drawings Upload */}
               <div className="space-y-5 pt-6 border-t border-slate-200">
-                <h3 className="font-bold text-xl text-slate-900 tracking-tight">Survey Drawings (Optional)</h3>
+                <h3 className="font-bold text-xl text-[var(--text-primary)] tracking-tight">Survey Drawings (Optional)</h3>
                 <p className="text-base text-slate-600">Upload plot survey drawings, site plans, or existing building plans</p>
                 <FileUpload
                   onFilesSelected={(files) => {
@@ -449,7 +449,7 @@ export default function NewProjectPage() {
 
               {/* Special Conditions */}
               <div className="space-y-5 pt-6 border-t border-slate-200">
-                <h3 className="font-bold text-xl text-slate-900 tracking-tight">Special Conditions</h3>
+                <h3 className="font-bold text-xl text-[var(--text-primary)] tracking-tight">Special Conditions</h3>
 
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2">
@@ -460,7 +460,7 @@ export default function NewProjectPage() {
                       onChange={(e) => setHeritage(e.target.checked)}
                       className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                     />
-                    <label htmlFor="heritage" className="text-sm text-gray-700">
+                    <label htmlFor="heritage" className="text-sm text-[var(--text-secondary)]">
                       Heritage Zone (additional restrictions may apply)
                     </label>
                   </div>
@@ -473,7 +473,7 @@ export default function NewProjectPage() {
                       onChange={(e) => setToz(e.target.checked)}
                       className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                     />
-                    <label htmlFor="toz" className="text-sm text-gray-700">
+                    <label htmlFor="toz" className="text-sm text-[var(--text-secondary)]">
                       Traffic Optimization Zone (TOZ)
                     </label>
                   </div>
@@ -486,7 +486,7 @@ export default function NewProjectPage() {
                       onChange={(e) => setSez(e.target.checked)}
                       className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                     />
-                    <label htmlFor="sez" className="text-sm text-gray-700">
+                    <label htmlFor="sez" className="text-sm text-[var(--text-secondary)]">
                       Special Economic Zone (SEZ)
                     </label>
                   </div>

@@ -67,12 +67,13 @@ export default function ProjectDetailPage() {
 
   if (!mounted || isLoading) {
     return (
-      <div className="min-h-screen gradient-mesh flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 bg-gradient-to-br from-cyan-600 via-cyan-500 to-cyan-600 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
-            <Building2 className="w-10 h-10 text-white" />
+      <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center">
+        <div className="fixed inset-0 bg-gradient-mesh pointer-events-none" />
+        <div className="text-center relative z-10">
+          <div className="w-16 h-16 bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)] rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <Building2 className="w-10 h-10 text-[var(--bg-primary)]" />
           </div>
-          <p className="text-slate-600 font-medium">Loading project...</p>
+          <p className="text-[var(--text-secondary)] font-medium">Loading project...</p>
         </div>
       </div>
     );
@@ -80,9 +81,10 @@ export default function ProjectDetailPage() {
 
   if (!project) {
     return (
-      <div className="min-h-screen gradient-mesh flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-slate-600 font-medium">Project not found</p>
+      <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center">
+        <div className="fixed inset-0 bg-gradient-mesh pointer-events-none" />
+        <div className="text-center relative z-10">
+          <p className="text-[var(--text-secondary)] font-medium">Project not found</p>
           <Button onClick={() => router.push('/dashboard')} className="mt-4">
             Back to Dashboard
           </Button>
@@ -102,9 +104,12 @@ export default function ProjectDetailPage() {
   const effectiveSetbacks = adjustedSetbacks ?? regulationResult?.setbacks;
 
   return (
-    <div className="min-h-screen gradient-mesh">
+    <div className="min-h-screen bg-[var(--bg-primary)]">
+      {/* Ambient background */}
+      <div className="fixed inset-0 bg-gradient-mesh pointer-events-none" />
+
       {/* Header */}
-      <header className="border-b border-slate-200/60 glass sticky top-0 z-50">
+      <header className="border-b border-[var(--border-default)] bg-[var(--bg-elevated)]/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -117,12 +122,12 @@ export default function ProjectDetailPage() {
               >
                 {navigatingTo !== '/dashboard' && <ArrowLeft className="w-4 h-4" />}
               </Button>
-              <div className="w-12 h-12 bg-gradient-to-br from-cyan-600 via-cyan-500 to-cyan-600 rounded-xl flex items-center justify-center shadow-md hover:shadow-lg hover:shadow-cyan-500/30 transition-all">
-                <Building2 className="w-7 h-7 text-white" />
+              <div className="w-12 h-12 bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)] rounded-xl flex items-center justify-center shadow-md hover:shadow-lg hover:shadow-[var(--accent-primary)]/30 transition-all">
+                <Building2 className="w-7 h-7 text-[var(--bg-primary)]" />
               </div>
               <div>
                 <span className="text-2xl font-extrabold gradient-text tracking-tight">{siteData.projectName}</span>
-                <p className="text-xs text-slate-600 font-semibold tracking-wide">
+                <p className="text-xs text-[var(--text-secondary)] font-semibold tracking-wide">
                   {reportId ? `Report ID: ${reportId}` : 'Draft Project'}
                 </p>
               </div>
@@ -146,50 +151,50 @@ export default function ProjectDetailPage() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         {/* Site Information */}
-        <Card glass className="mb-8 border border-slate-200/60">
+        <Card className="mb-8 bg-[var(--bg-elevated)] border border-[var(--border-default)]">
           <CardHeader>
             <CardTitle className="text-3xl">Site Information</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div className="space-y-2">
-                <p className="text-sm text-slate-600 font-semibold">Address</p>
-                <p className="font-bold text-slate-900 flex items-center gap-2.5">
-                  <MapPin className="w-5 h-5 text-slate-500" />
+                <p className="text-sm text-[var(--text-secondary)] font-semibold">Address</p>
+                <p className="font-bold text-[var(--text-primary)] flex items-center gap-2.5">
+                  <MapPin className="w-5 h-5 text-[var(--text-muted)]" />
                   {siteData.address}
                 </p>
               </div>
               <div className="space-y-2">
-                <p className="text-sm text-slate-600 font-semibold">Authority</p>
-                <p className="font-bold text-slate-900 text-lg">{siteData.authority}</p>
+                <p className="text-sm text-[var(--text-secondary)] font-semibold">Authority</p>
+                <p className="font-bold text-[var(--text-primary)] text-lg">{siteData.authority}</p>
               </div>
               <div className="space-y-2">
-                <p className="text-sm text-slate-600 font-semibold">Zone</p>
+                <p className="text-sm text-[var(--text-secondary)] font-semibold">Zone</p>
                 <Badge variant="info" className="text-sm py-1.5 px-4">{siteData.zone}</Badge>
               </div>
               <div className="space-y-2">
-                <p className="text-sm text-slate-600 font-semibold">Plot Area</p>
-                <p className="font-bold text-slate-900 text-lg">
+                <p className="text-sm text-[var(--text-secondary)] font-semibold">Plot Area</p>
+                <p className="font-bold text-[var(--text-primary)] text-lg">
                   {siteData.plotDimensions.area.toFixed(2)} sq.m
                 </p>
               </div>
               <div className="space-y-2">
-                <p className="text-sm text-slate-600 font-semibold">Plot Dimensions</p>
-                <p className="font-bold text-slate-900 text-lg">
+                <p className="text-sm text-[var(--text-secondary)] font-semibold">Plot Dimensions</p>
+                <p className="font-bold text-[var(--text-primary)] text-lg">
                   {siteData.plotDimensions.length}m × {siteData.plotDimensions.width}m
                 </p>
               </div>
               <div className="space-y-2">
-                <p className="text-sm text-slate-600 font-semibold">Road Width</p>
-                <p className="font-bold text-slate-900 text-lg">{siteData.roadWidthPrimary}m</p>
+                <p className="text-sm text-[var(--text-secondary)] font-semibold">Road Width</p>
+                <p className="font-bold text-[var(--text-primary)] text-lg">{siteData.roadWidthPrimary}m</p>
               </div>
               <div className="space-y-2">
-                <p className="text-sm text-slate-600 font-semibold">Intended Use</p>
-                <p className="font-bold text-slate-900 text-lg">{siteData.intendedUse}</p>
+                <p className="text-sm text-[var(--text-secondary)] font-semibold">Intended Use</p>
+                <p className="font-bold text-[var(--text-primary)] text-lg">{siteData.intendedUse}</p>
               </div>
               <div className="space-y-2">
-                <p className="text-sm text-slate-600 font-semibold">Corner Plot</p>
-                <p className="font-bold text-slate-900 text-lg">
+                <p className="text-sm text-[var(--text-secondary)] font-semibold">Corner Plot</p>
+                <p className="font-bold text-[var(--text-primary)] text-lg">
                   {siteData.isCornerPlot ? 'Yes' : 'No'}
                 </p>
               </div>
@@ -218,10 +223,10 @@ export default function ProjectDetailPage() {
         {regulationResult && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* FSI Card with Adjuster */}
-            <Card glass className="border border-slate-200/60">
+            <Card className="bg-[var(--bg-elevated)] border border-[var(--border-default)]">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3 text-2xl">
-                  <Layers className="w-6 h-6 text-cyan-600" />
+                  <Layers className="w-6 h-6 text-[var(--accent-primary)]" />
                   Floor Space Index (FSI)
                   <InfoTooltip content="FSI is the ratio of total built-up area to the plot area. It determines how much floor area can be constructed on a given plot." />
                   {adjustedFSI !== null && (
@@ -239,41 +244,41 @@ export default function ProjectDetailPage() {
                 <div className="space-y-6">
                   {/* Calculated Values */}
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 bg-slate-50/80 rounded-xl">
-                      <p className="text-sm text-slate-600 font-semibold mb-2">Base FSI</p>
-                      <p className="text-3xl font-extrabold text-slate-900">
+                    <div className="p-4 bg-[var(--bg-tertiary)] rounded-xl">
+                      <p className="text-sm text-[var(--text-secondary)] font-semibold mb-2">Base FSI</p>
+                      <p className="text-3xl font-extrabold text-[var(--text-primary)]">
                         {regulationResult.fsi.base}
                       </p>
                     </div>
-                    <div className="p-4 bg-cyan-50/80 rounded-xl border border-cyan-200/60">
-                      <p className="text-sm text-cyan-700 font-semibold mb-2">Premium</p>
-                      <p className="text-3xl font-extrabold text-cyan-700">
+                    <div className="p-4 bg-[var(--accent-subtle)] rounded-xl border border-[var(--accent-primary)]/30">
+                      <p className="text-sm text-[var(--accent-primary)] font-semibold mb-2">Premium</p>
+                      <p className="text-3xl font-extrabold text-[var(--accent-primary)]">
                         +{regulationResult.fsi.premium.toFixed(2)}
                       </p>
                     </div>
-                    <div className="p-4 bg-emerald-50/80 rounded-xl border border-emerald-200/60">
-                      <p className="text-sm text-emerald-700 font-semibold mb-2">
+                    <div className="p-4 bg-[var(--success-bg)] rounded-xl border border-[var(--success)]/30">
+                      <p className="text-sm text-[var(--success)] font-semibold mb-2">
                         {adjustedFSI !== null ? 'Calculated FSI' : 'Total FSI'}
                       </p>
-                      <p className="text-3xl font-extrabold text-emerald-700">
+                      <p className="text-3xl font-extrabold text-[var(--success)]">
                         {regulationResult.fsi.total.toFixed(2)}
                       </p>
                     </div>
-                    <div className="p-4 bg-indigo-50/80 rounded-xl border border-indigo-200/60">
-                      <p className="text-sm text-indigo-700 font-semibold mb-2">
+                    <div className="p-4 bg-[var(--blueprint-subtle)] rounded-xl border border-[var(--blueprint)]/30">
+                      <p className="text-sm text-[var(--blueprint)] font-semibold mb-2">
                         {adjustedBuiltUpArea !== null ? 'Calculated Area' : 'Max Built-up'}
                       </p>
-                      <p className="text-3xl font-extrabold text-indigo-700">
+                      <p className="text-3xl font-extrabold text-[var(--blueprint)]">
                         {regulationResult.fsi.maxBuiltUpArea.toFixed(0)}
                       </p>
-                      <p className="text-xs text-indigo-600 font-medium mt-1">sq.m</p>
+                      <p className="text-xs text-[var(--blueprint)] font-medium mt-1">sq.m</p>
                     </div>
                   </div>
 
                   {/* FSI Adjuster */}
-                  <div className="p-6 bg-gradient-to-br from-cyan-50 to-indigo-50 rounded-2xl border-2 border-cyan-200/60">
-                    <h4 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                      <Settings2 className="w-5 h-5 text-cyan-600" />
+                  <div className="p-6 bg-[var(--bg-tertiary)] rounded-2xl border-2 border-[var(--accent-primary)]/30">
+                    <h4 className="text-lg font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                      <Settings2 className="w-5 h-5 text-[var(--accent-primary)]" />
                       Adjust FSI
                     </h4>
                     <FSIAdjuster
@@ -288,7 +293,7 @@ export default function ProjectDetailPage() {
                     />
                   </div>
 
-                  <div className="p-4 bg-slate-50/80 rounded-xl text-sm text-slate-700 whitespace-pre-line font-mono leading-relaxed">
+                  <div className="p-4 bg-[var(--bg-tertiary)] rounded-xl text-sm text-[var(--text-secondary)] whitespace-pre-line font-mono leading-relaxed">
                     {regulationResult.fsi.calculation}
                   </div>
                 </div>
@@ -296,10 +301,10 @@ export default function ProjectDetailPage() {
             </Card>
 
             {/* Height Card */}
-            <Card glass className="border border-slate-200/60">
+            <Card className="bg-[var(--bg-elevated)] border border-[var(--border-default)]">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3 text-2xl">
-                  <Ruler className="w-6 h-6 text-cyan-600" />
+                  <Ruler className="w-6 h-6 text-[var(--accent-primary)]" />
                   Building Height
                 </CardTitle>
                 <CardDescription className="text-sm font-medium">
@@ -308,25 +313,25 @@ export default function ProjectDetailPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
-                  <div className="p-6 bg-gradient-to-br from-cyan-50 to-indigo-50 rounded-2xl border border-cyan-200/60">
-                    <p className="text-sm text-slate-700 font-semibold mb-3">Maximum Permissible Height</p>
-                    <p className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-cyan-600 to-indigo-600">
+                  <div className="p-6 bg-[var(--bg-tertiary)] rounded-2xl border border-[var(--accent-primary)]/30">
+                    <p className="text-sm text-[var(--text-secondary)] font-semibold mb-3">Maximum Permissible Height</p>
+                    <p className="text-5xl font-extrabold gradient-text">
                       {regulationResult.height.max.toFixed(2)}m
                     </p>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 bg-slate-50/80 rounded-xl">
-                      <p className="text-sm text-slate-600 font-semibold mb-2">Formula</p>
-                      <p className="font-bold text-slate-900">{regulationResult.height.formula}</p>
+                    <div className="p-4 bg-[var(--bg-tertiary)] rounded-xl">
+                      <p className="text-sm text-[var(--text-secondary)] font-semibold mb-2">Formula</p>
+                      <p className="font-bold text-[var(--text-primary)]">{regulationResult.height.formula}</p>
                     </div>
-                    <div className="p-4 bg-slate-50/80 rounded-xl">
-                      <p className="text-sm text-slate-600 font-semibold mb-2">Zone Limit</p>
-                      <p className="font-bold text-slate-900">
+                    <div className="p-4 bg-[var(--bg-tertiary)] rounded-xl">
+                      <p className="text-sm text-[var(--text-secondary)] font-semibold mb-2">Zone Limit</p>
+                      <p className="font-bold text-[var(--text-primary)]">
                         {regulationResult.height.zoneLimit}m
                       </p>
                     </div>
                   </div>
-                  <div className="p-4 bg-slate-50/80 rounded-xl text-sm text-slate-700 whitespace-pre-line font-mono leading-relaxed">
+                  <div className="p-4 bg-[var(--bg-tertiary)] rounded-xl text-sm text-[var(--text-secondary)] whitespace-pre-line font-mono leading-relaxed">
                     {regulationResult.height.calculation}
                   </div>
                 </div>
@@ -334,10 +339,10 @@ export default function ProjectDetailPage() {
             </Card>
 
             {/* Setbacks Card with Adjuster */}
-            <Card glass className="border border-slate-200/60">
+            <Card className="bg-[var(--bg-elevated)] border border-[var(--border-default)]">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3 text-2xl">
-                  <Building2 className="w-6 h-6 text-indigo-600" />
+                  <Building2 className="w-6 h-6 text-[var(--blueprint)]" />
                   Setbacks
                   <InfoTooltip content="Setbacks are the mandatory open spaces that must be left between the building and the plot boundaries for light, ventilation, and fire safety." />
                   {adjustedSetbacks !== null && (
@@ -355,36 +360,36 @@ export default function ProjectDetailPage() {
                 <div className="space-y-6">
                   {/* Calculated Values */}
                   <div className="grid grid-cols-3 gap-4">
-                    <div className="p-4 bg-indigo-50/80 rounded-xl border border-indigo-200/60">
-                      <p className="text-sm text-indigo-700 font-semibold mb-2">
+                    <div className="p-4 bg-[var(--blueprint-subtle)] rounded-xl border border-[var(--blueprint)]/30">
+                      <p className="text-sm text-[var(--blueprint)] font-semibold mb-2">
                         {adjustedSetbacks !== null ? 'Min Front' : 'Front'}
                       </p>
-                      <p className="text-3xl font-extrabold text-indigo-700">
+                      <p className="text-3xl font-extrabold text-[var(--blueprint)]">
                         {regulationResult.setbacks.front}m
                       </p>
                     </div>
-                    <div className="p-4 bg-cyan-50/80 rounded-xl border border-cyan-200/60">
-                      <p className="text-sm text-cyan-700 font-semibold mb-2">
+                    <div className="p-4 bg-[var(--accent-subtle)] rounded-xl border border-[var(--accent-primary)]/30">
+                      <p className="text-sm text-[var(--accent-primary)] font-semibold mb-2">
                         {adjustedSetbacks !== null ? 'Min Side' : 'Side'}
                       </p>
-                      <p className="text-3xl font-extrabold text-cyan-700">
+                      <p className="text-3xl font-extrabold text-[var(--accent-primary)]">
                         {regulationResult.setbacks.side}m
                       </p>
                     </div>
-                    <div className="p-4 bg-emerald-50/80 rounded-xl border border-emerald-200/60">
-                      <p className="text-sm text-emerald-700 font-semibold mb-2">
+                    <div className="p-4 bg-[var(--success-bg)] rounded-xl border border-[var(--success)]/30">
+                      <p className="text-sm text-[var(--success)] font-semibold mb-2">
                         {adjustedSetbacks !== null ? 'Min Rear' : 'Rear'}
                       </p>
-                      <p className="text-3xl font-extrabold text-emerald-700">
+                      <p className="text-3xl font-extrabold text-[var(--success)]">
                         {regulationResult.setbacks.rear}m
                       </p>
                     </div>
                   </div>
 
                   {/* Setback Adjuster */}
-                  <div className="p-6 bg-gradient-to-br from-indigo-50 to-cyan-50 rounded-2xl border-2 border-indigo-200/60">
-                    <h4 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                      <Settings2 className="w-5 h-5 text-indigo-600" />
+                  <div className="p-6 bg-[var(--bg-tertiary)] rounded-2xl border-2 border-[var(--blueprint)]/30">
+                    <h4 className="text-lg font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                      <Settings2 className="w-5 h-5 text-[var(--blueprint)]" />
                       Adjust Setbacks
                     </h4>
                     <SetbackAdjuster
@@ -396,7 +401,7 @@ export default function ProjectDetailPage() {
                     />
                   </div>
 
-                  <div className="p-4 bg-slate-50/80 rounded-xl text-sm text-slate-700 whitespace-pre-line font-mono leading-relaxed">
+                  <div className="p-4 bg-[var(--bg-tertiary)] rounded-xl text-sm text-[var(--text-secondary)] whitespace-pre-line font-mono leading-relaxed">
                     {regulationResult.setbacks.calculations}
                   </div>
                 </div>
@@ -404,10 +409,10 @@ export default function ProjectDetailPage() {
             </Card>
 
             {/* Ground Coverage Card */}
-            <Card glass className="border border-slate-200/60">
+            <Card className="bg-[var(--bg-elevated)] border border-[var(--border-default)]">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3 text-2xl">
-                  <Layers className="w-6 h-6 text-emerald-600" />
+                  <Layers className="w-6 h-6 text-[var(--success)]" />
                   Ground Coverage
                   <InfoTooltip content="Ground Coverage is the percentage of the plot area that can be covered by the building footprint at ground level." />
                 </CardTitle>
@@ -418,21 +423,21 @@ export default function ProjectDetailPage() {
               <CardContent>
                 <div className="space-y-6">
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 bg-emerald-50/80 rounded-xl border border-emerald-200/60">
-                      <p className="text-sm text-emerald-700 font-semibold mb-2">Maximum %</p>
-                      <p className="text-3xl font-extrabold text-emerald-700">
+                    <div className="p-4 bg-[var(--success-bg)] rounded-xl border border-[var(--success)]/30">
+                      <p className="text-sm text-[var(--success)] font-semibold mb-2">Maximum %</p>
+                      <p className="text-3xl font-extrabold text-[var(--success)]">
                         {regulationResult.groundCoverage.maxPercentage}%
                       </p>
                     </div>
-                    <div className="p-4 bg-slate-50/80 rounded-xl">
-                      <p className="text-sm text-slate-600 font-semibold mb-2">Max Area</p>
-                      <p className="text-3xl font-bold text-slate-900">
+                    <div className="p-4 bg-[var(--bg-tertiary)] rounded-xl">
+                      <p className="text-sm text-[var(--text-secondary)] font-semibold mb-2">Max Area</p>
+                      <p className="text-3xl font-bold text-[var(--text-primary)]">
                         {regulationResult.groundCoverage.maxArea.toFixed(0)}
                       </p>
-                      <p className="text-xs text-slate-500 mt-1">sq.m</p>
+                      <p className="text-xs text-[var(--text-muted)] mt-1">sq.m</p>
                     </div>
                   </div>
-                  <div className="p-4 bg-slate-50/80 rounded-xl text-sm text-slate-700 whitespace-pre-line font-mono leading-relaxed">
+                  <div className="p-4 bg-[var(--bg-tertiary)] rounded-xl text-sm text-[var(--text-secondary)] whitespace-pre-line font-mono leading-relaxed">
                     {regulationResult.groundCoverage.calculation}
                   </div>
                 </div>
@@ -440,10 +445,10 @@ export default function ProjectDetailPage() {
             </Card>
 
             {/* Parking Card with Area Calculator */}
-            <Card glass className="border border-slate-200/60 lg:col-span-2">
+            <Card className="bg-[var(--bg-elevated)] border border-[var(--border-default)] lg:col-span-2">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3 text-2xl">
-                  <Car className="w-6 h-6 text-indigo-600" />
+                  <Car className="w-6 h-6 text-[var(--blueprint)]" />
                   Parking Requirements
                   <InfoTooltip content="Parking requirements specify the minimum number of parking spaces needed based on the building use and area." />
                   {parkingAllocation !== null && (
@@ -461,28 +466,28 @@ export default function ProjectDetailPage() {
                 <div className="space-y-6">
                   {/* Calculated ECS Values */}
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 bg-indigo-50/80 rounded-xl border border-indigo-200/60">
-                      <p className="text-sm text-indigo-700 font-semibold mb-2 flex items-center gap-1">
+                    <div className="p-4 bg-[var(--blueprint-subtle)] rounded-xl border border-[var(--blueprint)]/30">
+                      <p className="text-sm text-[var(--blueprint)] font-semibold mb-2 flex items-center gap-1">
                         Required ECS
                         <InfoTooltip content="ECS (Equivalent Car Space) is the standard unit for measuring parking requirements. One ECS typically measures 2.5m × 5m." position="right" />
                       </p>
-                      <p className="text-3xl font-extrabold text-indigo-700">
+                      <p className="text-3xl font-extrabold text-[var(--blueprint)]">
                         {regulationResult.parking.required}
                       </p>
                     </div>
-                    <div className="p-4 bg-cyan-50/80 rounded-xl border border-cyan-200/60">
-                      <p className="text-sm text-cyan-700 font-semibold mb-2">Total Area Required</p>
-                      <p className="text-3xl font-extrabold text-cyan-700">
+                    <div className="p-4 bg-[var(--accent-subtle)] rounded-xl border border-[var(--accent-primary)]/30">
+                      <p className="text-sm text-[var(--accent-primary)] font-semibold mb-2">Total Area Required</p>
+                      <p className="text-3xl font-extrabold text-[var(--accent-primary)]">
                         {regulationResult.parking.areaRequired.toFixed(0)}
                       </p>
-                      <p className="text-xs text-cyan-600 font-medium mt-1">sq.m</p>
+                      <p className="text-xs text-[var(--accent-primary)] font-medium mt-1">sq.m</p>
                     </div>
                   </div>
 
                   {/* Parking Area Calculator */}
-                  <div className="p-6 bg-gradient-to-br from-indigo-50 to-cyan-50 rounded-2xl border-2 border-indigo-200/60">
-                    <h4 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                      <Settings2 className="w-5 h-5 text-indigo-600" />
+                  <div className="p-6 bg-[var(--bg-tertiary)] rounded-2xl border-2 border-[var(--blueprint)]/30">
+                    <h4 className="text-lg font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                      <Settings2 className="w-5 h-5 text-[var(--blueprint)]" />
                       Parking Space Allocation
                     </h4>
                     <ParkingAreaCalculator
@@ -493,7 +498,7 @@ export default function ProjectDetailPage() {
                     />
                   </div>
 
-                  <div className="p-4 bg-slate-50/80 rounded-xl text-sm text-slate-700 whitespace-pre-line font-mono leading-relaxed">
+                  <div className="p-4 bg-[var(--bg-tertiary)] rounded-xl text-sm text-[var(--text-secondary)] whitespace-pre-line font-mono leading-relaxed">
                     {regulationResult.parking.calculation}
                   </div>
                 </div>
@@ -501,10 +506,10 @@ export default function ProjectDetailPage() {
             </Card>
 
             {/* Fire Safety Card */}
-            <Card glass className="border border-slate-200/60">
+            <Card className="bg-[var(--bg-elevated)] border border-[var(--border-default)]">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3 text-2xl">
-                  <Flame className="w-6 h-6 text-orange-600" />
+                  <Flame className="w-6 h-6 text-[var(--warning)]" />
                   Fire Safety
                 </CardTitle>
                 <CardDescription className="text-sm font-medium">
@@ -513,13 +518,13 @@ export default function ProjectDetailPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <Badge className={regulationResult.fireSafety.required ? 'bg-orange-100 text-orange-700 border-orange-200' : 'bg-green-100 text-green-700 border-green-200'}>
+                  <Badge className={regulationResult.fireSafety.required ? 'bg-[var(--warning-bg)] text-[var(--warning)] border-[var(--warning)]/30' : 'bg-[var(--success-bg)] text-[var(--success)] border-[var(--success)]/30'}>
                     {regulationResult.fireSafety.required ? 'Required' : 'Basic Requirements'}
                   </Badge>
-                  <ul className="space-y-2 text-sm text-slate-700">
+                  <ul className="space-y-2 text-sm text-[var(--text-secondary)]">
                     {regulationResult.fireSafety.requirements.map((req, idx) => (
                       <li key={idx} className="flex items-start gap-2">
-                        <span className="text-orange-600 mt-1">•</span>
+                        <span className="text-[var(--warning)] mt-1">•</span>
                         <span>{req}</span>
                       </li>
                     ))}
@@ -536,15 +541,15 @@ export default function ProjectDetailPage() {
             <ApplicableNorms
               zone={siteData.zone}
               intendedUse={siteData.intendedUse}
-              className="border border-slate-200/60"
+              className="border border-[var(--border-default)]"
             />
           </div>
         )}
 
         {/* Disclaimer */}
-        <div className="mt-10 p-6 bg-amber-50/80 border-2 border-amber-200 rounded-2xl">
-          <p className="text-base text-amber-900 leading-relaxed">
-            <strong className="font-bold">Disclaimer:</strong> This is an advisory document based on GDCR 2017 regulations.
+        <div className="mt-10 p-6 bg-[var(--warning-bg)] border-2 border-[var(--warning)]/30 rounded-2xl">
+          <p className="text-base text-[var(--text-primary)] leading-relaxed">
+            <strong className="font-bold text-[var(--warning)]">Disclaimer:</strong> This is an advisory document based on GDCR 2017 regulations.
             Always verify calculations and requirements with the local authority ({siteData.authority}) before proceeding with construction.
           </p>
         </div>

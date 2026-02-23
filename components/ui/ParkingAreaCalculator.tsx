@@ -93,21 +93,21 @@ export function ParkingAreaCalculator({
   return (
     <div className="space-y-6">
       {/* Total Parking Area Display */}
-      <div className="p-6 bg-gradient-to-br from-indigo-50 to-cyan-50 rounded-2xl border border-indigo-200">
-        <p className="text-sm text-slate-700 font-semibold mb-2">Total Parking Area Required</p>
-        <p className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-indigo-600 to-cyan-600">
+      <div className="p-6 bg-[var(--bg-tertiary)] rounded-2xl border border-[var(--blueprint)]/30">
+        <p className="text-sm text-[var(--text-secondary)] font-semibold mb-2">Total Parking Area Required</p>
+        <p className="text-5xl font-extrabold gradient-text">
           {totalParkingArea.toFixed(0)} sq.m
         </p>
         <div className="mt-4 flex items-center gap-4">
           <div className="flex-1">
-            <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
+            <div className="h-2 bg-[var(--bg-secondary)] rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-indigo-500 to-cyan-500 transition-all duration-300"
+                className="h-full bg-gradient-to-r from-[var(--blueprint)] to-[var(--accent-primary)] transition-all duration-300"
                 style={{ width: `${Math.min(utilizationPercentage, 100)}%` }}
               />
             </div>
           </div>
-          <span className="text-sm font-bold text-slate-700">
+          <span className="text-sm font-bold text-[var(--text-secondary)]">
             {utilizationPercentage.toFixed(1)}% used
           </span>
         </div>
@@ -115,23 +115,23 @@ export function ParkingAreaCalculator({
 
       {/* Preset Splits */}
       <div>
-        <p className="text-sm text-slate-600 font-semibold mb-3">Quick Allocation Presets</p>
+        <p className="text-sm text-[var(--text-secondary)] font-semibold mb-3">Quick Allocation Presets</p>
         <div className="grid grid-cols-3 gap-3">
           <button
             onClick={() => handlePresetSplit(80)}
-            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg transition-colors text-sm"
+            className="px-4 py-2 bg-[var(--bg-secondary)] hover:bg-[var(--bg-tertiary)] text-[var(--text-secondary)] font-semibold rounded-lg transition-colors text-sm"
           >
             80% Car / 20% 2W
           </button>
           <button
             onClick={() => handlePresetSplit(70)}
-            className="px-4 py-2 bg-cyan-100 hover:bg-cyan-200 text-cyan-700 font-semibold rounded-lg transition-colors text-sm"
+            className="px-4 py-2 bg-[var(--accent-subtle)] hover:bg-[var(--accent-primary)]/20 text-[var(--accent-primary)] font-semibold rounded-lg transition-colors text-sm"
           >
             70% Car / 30% 2W
           </button>
           <button
             onClick={() => handlePresetSplit(60)}
-            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg transition-colors text-sm"
+            className="px-4 py-2 bg-[var(--bg-secondary)] hover:bg-[var(--bg-tertiary)] text-[var(--text-secondary)] font-semibold rounded-lg transition-colors text-sm"
           >
             60% Car / 40% 2W
           </button>
@@ -141,14 +141,14 @@ export function ParkingAreaCalculator({
       {/* Allocation Controls */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Car Parking */}
-        <div className="p-5 bg-indigo-50/80 border-2 border-indigo-200 rounded-xl">
+        <div className="p-5 bg-[var(--blueprint-subtle)] border-2 border-[var(--blueprint)]/30 rounded-xl">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center">
-              <Car className="w-6 h-6 text-white" />
+            <div className="w-12 h-12 bg-[var(--blueprint)] rounded-xl flex items-center justify-center">
+              <Car className="w-6 h-6 text-[var(--bg-primary)]" />
             </div>
             <div>
-              <h4 className="font-bold text-slate-900">Car Parking</h4>
-              <p className="text-xs text-slate-600">
+              <h4 className="font-bold text-[var(--text-primary)]">Car Parking</h4>
+              <p className="text-xs text-[var(--text-muted)]">
                 {CAR_SPACE_AREA} sq.m per space
               </p>
             </div>
@@ -156,7 +156,7 @@ export function ParkingAreaCalculator({
 
           <div className="space-y-3">
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
+              <label className="block text-sm font-semibold text-[var(--text-secondary)] mb-2">
                 Number of Spaces
               </label>
               <input
@@ -164,21 +164,21 @@ export function ParkingAreaCalculator({
                 min="0"
                 value={carSpaces}
                 onChange={handleCarSpacesChange}
-                className="w-full px-4 py-3 border border-indigo-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-bold text-lg text-slate-900"
+                className="w-full px-4 py-3 bg-[var(--bg-secondary)] border border-[var(--border-default)] rounded-lg focus:ring-2 focus:ring-[var(--blueprint)] focus:border-[var(--blueprint)] font-bold text-lg text-[var(--text-primary)]"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3 text-sm">
-              <div className="p-3 bg-white/60 rounded-lg">
-                <p className="text-slate-600 mb-1">Area Used</p>
-                <p className="text-xl font-bold text-indigo-700">
+              <div className="p-3 bg-[var(--bg-secondary)] rounded-lg">
+                <p className="text-[var(--text-muted)] mb-1">Area Used</p>
+                <p className="text-xl font-bold text-[var(--blueprint)]">
                   {carArea.toFixed(1)}
                 </p>
-                <p className="text-xs text-slate-500">sq.m</p>
+                <p className="text-xs text-[var(--text-muted)]">sq.m</p>
               </div>
-              <div className="p-3 bg-white/60 rounded-lg">
-                <p className="text-slate-600 mb-1">Allocation</p>
-                <p className="text-xl font-bold text-indigo-700">
+              <div className="p-3 bg-[var(--bg-secondary)] rounded-lg">
+                <p className="text-[var(--text-muted)] mb-1">Allocation</p>
+                <p className="text-xl font-bold text-[var(--blueprint)]">
                   {((carArea / totalParkingArea) * 100).toFixed(1)}%
                 </p>
               </div>
@@ -187,14 +187,14 @@ export function ParkingAreaCalculator({
         </div>
 
         {/* Two-Wheeler Parking */}
-        <div className="p-5 bg-cyan-50/80 border-2 border-cyan-200 rounded-xl">
+        <div className="p-5 bg-[var(--accent-subtle)] border-2 border-[var(--accent-primary)]/30 rounded-xl">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-cyan-600 rounded-xl flex items-center justify-center">
-              <Bike className="w-6 h-6 text-white" />
+            <div className="w-12 h-12 bg-[var(--accent-primary)] rounded-xl flex items-center justify-center">
+              <Bike className="w-6 h-6 text-[var(--bg-primary)]" />
             </div>
             <div>
-              <h4 className="font-bold text-slate-900">Two-Wheeler Parking</h4>
-              <p className="text-xs text-slate-600">
+              <h4 className="font-bold text-[var(--text-primary)]">Two-Wheeler Parking</h4>
+              <p className="text-xs text-[var(--text-muted)]">
                 {TWO_WHEELER_SPACE_AREA} sq.m per space
               </p>
             </div>
@@ -202,7 +202,7 @@ export function ParkingAreaCalculator({
 
           <div className="space-y-3">
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
+              <label className="block text-sm font-semibold text-[var(--text-secondary)] mb-2">
                 Number of Spaces
               </label>
               <input
@@ -210,21 +210,21 @@ export function ParkingAreaCalculator({
                 min="0"
                 value={twoWheelerSpaces}
                 onChange={handleTwoWheelerSpacesChange}
-                className="w-full px-4 py-3 border border-cyan-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 font-bold text-lg text-slate-900"
+                className="w-full px-4 py-3 bg-[var(--bg-secondary)] border border-[var(--border-default)] rounded-lg focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-[var(--accent-primary)] font-bold text-lg text-[var(--text-primary)]"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3 text-sm">
-              <div className="p-3 bg-white/60 rounded-lg">
-                <p className="text-slate-600 mb-1">Area Used</p>
-                <p className="text-xl font-bold text-cyan-700">
+              <div className="p-3 bg-[var(--bg-secondary)] rounded-lg">
+                <p className="text-[var(--text-muted)] mb-1">Area Used</p>
+                <p className="text-xl font-bold text-[var(--accent-primary)]">
                   {twoWheelerArea.toFixed(1)}
                 </p>
-                <p className="text-xs text-slate-500">sq.m</p>
+                <p className="text-xs text-[var(--text-muted)]">sq.m</p>
               </div>
-              <div className="p-3 bg-white/60 rounded-lg">
-                <p className="text-slate-600 mb-1">Allocation</p>
-                <p className="text-xl font-bold text-cyan-700">
+              <div className="p-3 bg-[var(--bg-secondary)] rounded-lg">
+                <p className="text-[var(--text-muted)] mb-1">Allocation</p>
+                <p className="text-xl font-bold text-[var(--accent-primary)]">
                   {((twoWheelerArea / totalParkingArea) * 100).toFixed(1)}%
                 </p>
               </div>
@@ -234,34 +234,34 @@ export function ParkingAreaCalculator({
       </div>
 
       {/* Summary */}
-      <div className="p-5 bg-slate-50/80 border border-slate-200 rounded-xl">
+      <div className="p-5 bg-[var(--bg-tertiary)] border border-[var(--border-default)] rounded-xl">
         <div className="grid grid-cols-3 gap-4 text-center">
           <div>
-            <p className="text-xs text-slate-600 mb-1">Total Used</p>
-            <p className="text-2xl font-bold text-slate-900">
+            <p className="text-xs text-[var(--text-muted)] mb-1">Total Used</p>
+            <p className="text-2xl font-bold text-[var(--text-primary)]">
               {totalUsedArea.toFixed(1)}
             </p>
-            <p className="text-xs text-slate-500">sq.m</p>
+            <p className="text-xs text-[var(--text-muted)]">sq.m</p>
           </div>
           <div>
-            <p className="text-xs text-slate-600 mb-1">Remaining</p>
-            <p className={`text-2xl font-bold ${remainingArea < 0 ? 'text-red-600' : 'text-emerald-600'}`}>
+            <p className="text-xs text-[var(--text-muted)] mb-1">Remaining</p>
+            <p className={`text-2xl font-bold ${remainingArea < 0 ? 'text-[var(--error)]' : 'text-[var(--success)]'}`}>
               {remainingArea.toFixed(1)}
             </p>
-            <p className="text-xs text-slate-500">sq.m</p>
+            <p className="text-xs text-[var(--text-muted)]">sq.m</p>
           </div>
           <div>
-            <p className="text-xs text-slate-600 mb-1">Total Spaces</p>
-            <p className="text-2xl font-bold text-slate-900">
+            <p className="text-xs text-[var(--text-muted)] mb-1">Total Spaces</p>
+            <p className="text-2xl font-bold text-[var(--text-primary)]">
               {carSpaces + twoWheelerSpaces}
             </p>
-            <p className="text-xs text-slate-500">spaces</p>
+            <p className="text-xs text-[var(--text-muted)]">spaces</p>
           </div>
         </div>
 
         {remainingArea < 0 && (
-          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-700">
+          <div className="mt-4 p-3 bg-[var(--error-bg)] border border-[var(--error)]/30 rounded-lg">
+            <p className="text-sm text-[var(--error)]">
               <strong>Warning:</strong> Allocated area exceeds total parking area by {Math.abs(remainingArea).toFixed(1)} sq.m
             </p>
           </div>
@@ -269,11 +269,11 @@ export function ParkingAreaCalculator({
       </div>
 
       {/* Information */}
-      <div className="p-4 bg-amber-50/80 border border-amber-200 rounded-xl text-sm text-amber-900">
+      <div className="p-4 bg-[var(--warning-bg)] border border-[var(--warning)]/30 rounded-xl text-sm text-[var(--text-primary)]">
         <p>
-          <strong>Standard Dimensions (GDCR):</strong>
+          <strong className="text-[var(--warning)]">Standard Dimensions (GDCR):</strong>
         </p>
-        <ul className="mt-2 space-y-1 ml-4 list-disc">
+        <ul className="mt-2 space-y-1 ml-4 list-disc text-[var(--text-secondary)]">
           <li>Car: 2.5m × 5m = {CAR_SPACE_AREA} sq.m (excluding circulation)</li>
           <li>Two-wheeler: 0.75m × 2.3m ≈ {TWO_WHEELER_SPACE_AREA} sq.m</li>
           <li>Add 30-40% circulation area for actual layout design</li>

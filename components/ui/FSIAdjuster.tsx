@@ -55,28 +55,28 @@ export function FSIAdjuster({
       {/* FSI Value Display */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm text-slate-600 font-semibold mb-1">Current FSI</p>
-          <p className="text-4xl font-extrabold text-cyan-600">
+          <p className="text-sm text-[var(--text-secondary)] font-semibold mb-1">Current FSI</p>
+          <p className="text-4xl font-extrabold text-[var(--accent-primary)]">
             {adjustedFSI.toFixed(2)}
           </p>
           {isAdjusted && (
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-[var(--text-muted)] mt-1">
               Original: {currentFSI.toFixed(2)}
             </p>
           )}
         </div>
         <div className="text-right">
-          <p className="text-sm text-slate-600 font-semibold mb-1">Max Built-up Area</p>
-          <p className="text-3xl font-bold text-slate-900">
+          <p className="text-sm text-[var(--text-secondary)] font-semibold mb-1">Max Built-up Area</p>
+          <p className="text-3xl font-bold text-[var(--text-primary)]">
             {builtUpArea.toFixed(0)}
           </p>
-          <p className="text-xs text-slate-500 mt-1">sq.m</p>
+          <p className="text-xs text-[var(--text-muted)] mt-1">sq.m</p>
         </div>
       </div>
 
       {/* Slider */}
       <div className="space-y-2">
-        <div className="flex items-center justify-between text-xs text-slate-600">
+        <div className="flex items-center justify-between text-xs text-[var(--text-secondary)]">
           <span>Base: {baseFSI}</span>
           <span>Max: {maxFSI}</span>
         </div>
@@ -87,9 +87,9 @@ export function FSIAdjuster({
           step={0.1}
           value={adjustedFSI}
           onChange={handleSliderChange}
-          className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-cyan-600"
+          className="w-full h-2 bg-[var(--bg-tertiary)] rounded-lg appearance-none cursor-pointer accent-[var(--accent-primary)]"
           style={{
-            background: `linear-gradient(to right, rgb(8 145 178) 0%, rgb(8 145 178) ${((adjustedFSI - baseFSI) / (maxFSI - baseFSI)) * 100}%, rgb(226 232 240) ${((adjustedFSI - baseFSI) / (maxFSI - baseFSI)) * 100}%, rgb(226 232 240) 100%)`,
+            background: `linear-gradient(to right, var(--accent-primary) 0%, var(--accent-primary) ${((adjustedFSI - baseFSI) / (maxFSI - baseFSI)) * 100}%, var(--bg-tertiary) ${((adjustedFSI - baseFSI) / (maxFSI - baseFSI)) * 100}%, var(--bg-tertiary) 100%)`,
           }}
         />
       </div>
@@ -99,7 +99,7 @@ export function FSIAdjuster({
         <button
           onClick={handleDecrease}
           disabled={adjustedFSI <= baseFSI}
-          className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-slate-100 hover:bg-slate-200 disabled:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed text-slate-700 font-semibold rounded-xl transition-colors"
+          className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[var(--bg-secondary)] hover:bg-[var(--bg-tertiary)] disabled:opacity-50 disabled:cursor-not-allowed text-[var(--text-secondary)] font-semibold rounded-xl transition-colors"
         >
           <Minus className="w-4 h-4" />
           Decrease
@@ -107,7 +107,7 @@ export function FSIAdjuster({
         <button
           onClick={handleIncrease}
           disabled={adjustedFSI >= maxFSI}
-          className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-cyan-100 hover:bg-cyan-200 disabled:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed text-cyan-700 font-semibold rounded-xl transition-colors"
+          className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[var(--accent-subtle)] hover:bg-[var(--accent-primary)]/20 disabled:opacity-50 disabled:cursor-not-allowed text-[var(--accent-primary)] font-semibold rounded-xl transition-colors"
         >
           <Plus className="w-4 h-4" />
           Increase
@@ -115,7 +115,7 @@ export function FSIAdjuster({
         {isAdjusted && (
           <button
             onClick={handleReset}
-            className="px-4 py-3 bg-amber-100 hover:bg-amber-200 text-amber-700 font-semibold rounded-xl transition-colors flex items-center gap-2"
+            className="px-4 py-3 bg-[var(--warning-bg)] hover:bg-[var(--warning)]/20 text-[var(--warning)] font-semibold rounded-xl transition-colors flex items-center gap-2"
             title="Reset to calculated value"
           >
             <RotateCcw className="w-4 h-4" />
@@ -124,11 +124,11 @@ export function FSIAdjuster({
       </div>
 
       {/* Information */}
-      <div className="p-4 bg-cyan-50/80 border border-cyan-200 rounded-xl">
-        <p className="text-sm text-cyan-900">
+      <div className="p-4 bg-[var(--accent-subtle)] border border-[var(--accent-primary)]/30 rounded-xl">
+        <p className="text-sm text-[var(--text-primary)]">
           <strong>Range:</strong> Base FSI ({baseFSI}) to Maximum FSI ({maxFSI})
         </p>
-        <p className="text-xs text-cyan-700 mt-1">
+        <p className="text-xs text-[var(--text-secondary)] mt-1">
           Adjust FSI in increments of 0.1 to optimize your building design while staying within regulatory limits.
         </p>
       </div>

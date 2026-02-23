@@ -103,9 +103,12 @@ export default function BulkAnalysisPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 via-white to-teal-50">
+    <div className="min-h-screen bg-[var(--bg-primary)]">
+      {/* Ambient background */}
+      <div className="fixed inset-0 bg-gradient-mesh pointer-events-none" />
+
       {/* Header */}
-      <header className="border-b border-stone-200 glass sticky top-0 z-50">
+      <header className="border-b border-[var(--border-default)] bg-[var(--bg-elevated)]/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -118,12 +121,12 @@ export default function BulkAnalysisPage() {
               >
                 {navigatingTo !== '/dashboard' && <ArrowLeft className="w-4 h-4" />}
               </Button>
-              <div className="w-12 h-12 bg-gradient-to-br from-teal-600 to-teal-500 rounded-2xl flex items-center justify-center shadow-lg shadow-teal-500/30">
-                <FileSpreadsheet className="w-7 h-7 text-white" />
+              <div className="w-12 h-12 bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)] rounded-2xl flex items-center justify-center shadow-lg shadow-[var(--accent-primary)]/30">
+                <FileSpreadsheet className="w-7 h-7 text-[var(--bg-primary)]" />
               </div>
               <div>
                 <span className="text-2xl font-bold gradient-text">Bulk Analysis</span>
-                <p className="text-sm text-gray-600">Process multiple sites simultaneously</p>
+                <p className="text-sm text-[var(--text-secondary)]">Process multiple sites simultaneously</p>
               </div>
             </div>
           </div>
@@ -144,12 +147,12 @@ export default function BulkAnalysisPage() {
             <CardContent>
               <div className="space-y-6">
                 {/* Instructions */}
-                <div className="glass-dark rounded-2xl p-6">
-                  <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                    <FileSpreadsheet className="w-5 h-5 text-teal-600" />
+                <div className="bg-[var(--bg-tertiary)] border border-[var(--border-default)] rounded-2xl p-6">
+                  <h3 className="font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
+                    <FileSpreadsheet className="w-5 h-5 text-[var(--accent-primary)]" />
                     How it works:
                   </h3>
-                  <ol className="list-decimal list-inside space-y-2 text-sm text-gray-700">
+                  <ol className="list-decimal list-inside space-y-2 text-sm text-[var(--text-secondary)]">
                     <li>Download the CSV template below</li>
                     <li>Fill in your site details (one row per site)</li>
                     <li>Upload the completed CSV file</li>
@@ -165,7 +168,7 @@ export default function BulkAnalysisPage() {
                 </Button>
 
                 {/* File Upload */}
-                <div className="border-2 border-dashed border-stone-300 rounded-3xl p-8 text-center hover:border-teal-400 transition-all smooth-transition hover:bg-stone-50">
+                <div className="border-2 border-dashed border-[var(--border-strong)] rounded-3xl p-8 text-center hover:border-[var(--accent-primary)] transition-all smooth-transition hover:bg-[var(--bg-tertiary)]">
                   <input
                     type="file"
                     id="csv-upload"
@@ -174,42 +177,42 @@ export default function BulkAnalysisPage() {
                     className="hidden"
                   />
                   <label htmlFor="csv-upload" className="cursor-pointer">
-                    <div className="w-16 h-16 bg-teal-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                      <Upload className="w-8 h-8 text-teal-600" />
+                    <div className="w-16 h-16 bg-[var(--accent-subtle)] rounded-2xl flex items-center justify-center mx-auto mb-4">
+                      <Upload className="w-8 h-8 text-[var(--accent-primary)]" />
                     </div>
                     {csvFile ? (
                       <div>
-                        <p className="text-base font-semibold text-gray-900 mb-1">{csvFile.name}</p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-base font-semibold text-[var(--text-primary)] mb-1">{csvFile.name}</p>
+                        <p className="text-sm text-[var(--text-secondary)]">
                           {(csvFile.size / 1024).toFixed(2)} KB
                         </p>
-                        <p className="text-sm text-teal-600 mt-2 font-medium">Click to change file</p>
+                        <p className="text-sm text-[var(--accent-primary)] mt-2 font-medium">Click to change file</p>
                       </div>
                     ) : (
                       <div>
-                        <p className="text-base font-semibold text-gray-900 mb-1">
+                        <p className="text-base font-semibold text-[var(--text-primary)] mb-1">
                           Click to upload CSV file
                         </p>
-                        <p className="text-sm text-gray-600">or drag and drop</p>
+                        <p className="text-sm text-[var(--text-secondary)]">or drag and drop</p>
                       </div>
                     )}
                   </label>
                 </div>
 
                 {error && (
-                  <div className="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-start gap-3">
-                    <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                  <div className="bg-[var(--error-bg)] border border-[var(--error)]/30 rounded-2xl p-4 flex items-start gap-3">
+                    <AlertCircle className="w-5 h-5 text-[var(--error)] flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="font-semibold text-red-900 mb-1">Error Processing CSV</p>
-                      <p className="text-sm text-red-700">{error}</p>
+                      <p className="font-semibold text-[var(--error)] mb-1">Error Processing CSV</p>
+                      <p className="text-sm text-[var(--text-secondary)]">{error}</p>
                     </div>
                   </div>
                 )}
 
                 {isProcessing && (
-                  <div className="glass rounded-2xl p-6">
+                  <div className="bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-2xl p-6">
                     <div className="flex items-center justify-between mb-4">
-                      <h4 className="font-semibold text-gray-900">Processing Sites...</h4>
+                      <h4 className="font-semibold text-[var(--text-primary)]">Processing Sites...</h4>
                       <CircularProgress value={progress} size={60} showLabel />
                     </div>
                     <Progress value={progress} showLabel color="primary" />
@@ -217,43 +220,43 @@ export default function BulkAnalysisPage() {
                 )}
 
                 {/* CSV Format Reference */}
-                <div className="glass-dark rounded-2xl p-5">
-                  <h3 className="font-semibold text-gray-900 mb-3 text-sm">Required Columns:</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-xs text-gray-700">
+                <div className="bg-[var(--bg-tertiary)] border border-[var(--border-default)] rounded-2xl p-5">
+                  <h3 className="font-semibold text-[var(--text-primary)] mb-3 text-sm">Required Columns:</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-xs text-[var(--text-secondary)]">
                     <div className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 bg-teal-600 rounded-full" />
+                      <div className="w-1.5 h-1.5 bg-[var(--accent-primary)] rounded-full" />
                       Project Name
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 bg-teal-600 rounded-full" />
+                      <div className="w-1.5 h-1.5 bg-[var(--accent-primary)] rounded-full" />
                       Plot Area (sq.m)
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 bg-teal-600 rounded-full" />
+                      <div className="w-1.5 h-1.5 bg-[var(--accent-primary)] rounded-full" />
                       Plot Width (m)
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 bg-teal-600 rounded-full" />
+                      <div className="w-1.5 h-1.5 bg-[var(--accent-primary)] rounded-full" />
                       Plot Depth (m)
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 bg-teal-600 rounded-full" />
+                      <div className="w-1.5 h-1.5 bg-[var(--accent-primary)] rounded-full" />
                       Road Width (m)
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 bg-teal-600 rounded-full" />
+                      <div className="w-1.5 h-1.5 bg-[var(--accent-primary)] rounded-full" />
                       Zone
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 bg-teal-600 rounded-full" />
+                      <div className="w-1.5 h-1.5 bg-[var(--accent-primary)] rounded-full" />
                       Corner Plot (yes/no)
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 bg-teal-600 rounded-full" />
+                      <div className="w-1.5 h-1.5 bg-[var(--accent-primary)] rounded-full" />
                       Premium FSI (yes/no)
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 bg-teal-600 rounded-full" />
+                      <div className="w-1.5 h-1.5 bg-[var(--accent-primary)] rounded-full" />
                       TDR FSI
                     </div>
                   </div>
@@ -273,7 +276,7 @@ export default function BulkAnalysisPage() {
                 </Button>
 
                 {/* Note */}
-                <p className="text-xs text-gray-500 text-center">
+                <p className="text-xs text-[var(--text-muted)] text-center">
                   Processing time depends on the number of sites. You'll receive a detailed
                   comparative report when complete.
                 </p>
@@ -283,15 +286,15 @@ export default function BulkAnalysisPage() {
         ) : (
           <>
             {/* Success State */}
-            <div className="glass rounded-3xl p-6 border border-emerald-200 bg-emerald-50/50">
+            <div className="bg-[var(--bg-elevated)] rounded-3xl p-6 border border-[var(--success)]/30 bg-[var(--success-bg)]">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-emerald-600 rounded-2xl flex items-center justify-center">
-                    <CheckCircle2 className="w-7 h-7 text-white" />
+                  <div className="w-12 h-12 bg-[var(--success)] rounded-2xl flex items-center justify-center">
+                    <CheckCircle2 className="w-7 h-7 text-[var(--bg-primary)]" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-900 text-lg">Processing Complete!</h3>
-                    <p className="text-sm text-gray-600">
+                    <h3 className="font-bold text-[var(--text-primary)] text-lg">Processing Complete!</h3>
+                    <p className="text-sm text-[var(--text-secondary)]">
                       Successfully analyzed {processedProjects.length} sites
                     </p>
                   </div>
@@ -322,24 +325,24 @@ export default function BulkAnalysisPage() {
                   {processedProjects.map((project) => (
                     <div
                       key={project.id}
-                      className={`glass rounded-2xl p-5 hover-lift cursor-pointer border border-stone-200 ${navigatingTo === `/projects/${project.id}` ? 'opacity-50' : ''}`}
+                      className={`bg-[var(--bg-elevated)] rounded-2xl p-5 hover-lift cursor-pointer border border-[var(--border-default)] hover:border-[var(--accent-primary)] transition-all ${navigatingTo === `/projects/${project.id}` ? 'opacity-50' : ''}`}
                       onClick={() => handleNavigation(`/projects/${project.id}`)}
                     >
-                      <h4 className="font-bold text-gray-900 mb-3">{project.siteData?.projectName || 'Unnamed'}</h4>
+                      <h4 className="font-bold text-[var(--text-primary)] mb-3">{project.siteData?.projectName || 'Unnamed'}</h4>
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Zone:</span>
-                          <span className="font-semibold text-gray-900">{project.siteData?.zone || 'N/A'}</span>
+                          <span className="text-[var(--text-secondary)]">Zone:</span>
+                          <span className="font-semibold text-[var(--text-primary)]">{project.siteData?.zone || 'N/A'}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Max FSI:</span>
-                          <span className="font-semibold text-teal-600">
+                          <span className="text-[var(--text-secondary)]">Max FSI:</span>
+                          <span className="font-semibold text-[var(--accent-primary)]">
                             {project.regulationResult?.fsi?.total.toFixed(2) || 'N/A'}
                           </span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Max Height:</span>
-                          <span className="font-semibold text-teal-600">
+                          <span className="text-[var(--text-secondary)]">Max Height:</span>
+                          <span className="font-semibold text-[var(--accent-primary)]">
                             {project.regulationResult?.height?.max.toFixed(2) || 'N/A'} m
                           </span>
                         </div>

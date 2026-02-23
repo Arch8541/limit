@@ -99,8 +99,8 @@ export function FileUpload({
           transition-all duration-300 smooth-transition
           ${
             isDragActive
-              ? 'border-teal-500 bg-teal-50/50 scale-105'
-              : 'border-stone-300 hover:border-teal-400 hover:bg-stone-50'
+              ? 'border-[var(--accent-primary)] bg-[var(--accent-subtle)] scale-[1.02]'
+              : 'border-[var(--border-strong)] hover:border-[var(--accent-primary)] bg-[var(--bg-tertiary)]'
           }
         `}
       >
@@ -109,17 +109,17 @@ export function FileUpload({
           <div
             className={`
             w-16 h-16 rounded-2xl flex items-center justify-center
-            ${isDragActive ? 'bg-teal-600 scale-110' : 'bg-teal-100'}
+            ${isDragActive ? 'bg-[var(--accent-primary)] scale-110' : 'bg-[var(--blueprint-subtle)]'}
             transition-all duration-300
           `}
           >
-            <Upload className={`w-8 h-8 ${isDragActive ? 'text-white' : 'text-teal-600'}`} />
+            <Upload className={`w-8 h-8 ${isDragActive ? 'text-[var(--bg-primary)]' : 'text-[var(--blueprint)]'}`} />
           </div>
           <div>
-            <p className="text-lg font-semibold text-gray-900">
+            <p className="text-lg font-semibold text-[var(--text-primary)]">
               {isDragActive ? 'Drop files here' : 'Drag & drop files here'}
             </p>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-[var(--text-secondary)] mt-1">
               or click to browse (PDF, DWG, JPG, PNG up to {formatFileSize(maxSize)})
             </p>
           </div>
@@ -128,25 +128,25 @@ export function FileUpload({
 
       {uploadedFiles.length > 0 && (
         <div className="mt-6 space-y-3">
-          <h4 className="font-semibold text-gray-900">Uploaded Files ({uploadedFiles.length})</h4>
+          <h4 className="font-semibold text-[var(--text-primary)]">Uploaded Files ({uploadedFiles.length})</h4>
           {uploadedFiles.map((uploadedFile, index) => (
             <div
               key={index}
-              className="glass rounded-2xl p-4 hover-lift transition-all duration-300"
+              className="bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-2xl p-4 hover-lift transition-all duration-300"
             >
               <div className="flex items-start gap-4">
                 {uploadedFile.preview ? (
                   <img
                     src={uploadedFile.preview}
                     alt={uploadedFile.file.name}
-                    className="w-16 h-16 object-cover rounded-xl border border-stone-200"
+                    className="w-16 h-16 object-cover rounded-xl border border-[var(--border-default)]"
                   />
                 ) : (
-                  <div className="w-16 h-16 bg-teal-100 rounded-xl flex items-center justify-center">
+                  <div className="w-16 h-16 bg-[var(--blueprint-subtle)] rounded-xl flex items-center justify-center">
                     {uploadedFile.file.type === 'application/pdf' ? (
-                      <File className="w-8 h-8 text-teal-600" />
+                      <File className="w-8 h-8 text-[var(--blueprint)]" />
                     ) : (
-                      <FileImage className="w-8 h-8 text-teal-600" />
+                      <FileImage className="w-8 h-8 text-[var(--blueprint)]" />
                     )}
                   </div>
                 )}
@@ -154,14 +154,14 @@ export function FileUpload({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-gray-900 truncate">{uploadedFile.file.name}</p>
-                      <p className="text-sm text-gray-600">{formatFileSize(uploadedFile.file.size)}</p>
+                      <p className="font-medium text-[var(--text-primary)] truncate">{uploadedFile.file.name}</p>
+                      <p className="text-sm text-[var(--text-secondary)]">{formatFileSize(uploadedFile.file.size)}</p>
                     </div>
                     <button
                       onClick={() => removeFile(uploadedFile)}
-                      className="p-1 hover:bg-red-100 rounded-lg transition-colors"
+                      className="p-1 hover:bg-[var(--error-bg)] rounded-lg transition-colors"
                     >
-                      <X className="w-4 h-4 text-red-600" />
+                      <X className="w-4 h-4 text-[var(--error)]" />
                     </button>
                   </div>
 
@@ -172,7 +172,7 @@ export function FileUpload({
                   )}
 
                   {uploadedFile.status === 'success' && (
-                    <div className="mt-2 flex items-center gap-2 text-emerald-600">
+                    <div className="mt-2 flex items-center gap-2 text-[var(--success)]">
                       <CheckCircle2 className="w-4 h-4" />
                       <span className="text-sm font-medium">Upload complete</span>
                     </div>
