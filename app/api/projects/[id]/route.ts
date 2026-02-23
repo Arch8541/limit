@@ -9,11 +9,21 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    console.log('GET /api/projects/[id] - Starting request');
+
+    if (!process.env.DATABASE_URL) {
+      console.error('DATABASE_URL is not set');
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+    }
+
     const session = await auth();
+    console.log('Session:', session ? 'authenticated' : 'not authenticated');
+
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     const userId = session.user.id;
+    console.log('User ID:', userId);
 
     const { id } = await params;
 
@@ -40,8 +50,11 @@ export async function GET(
     return NextResponse.json({ project: dbProjectToAppProject(parsed) });
   } catch (error) {
     console.error('Get project error:', error);
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack');
+
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { error: 'Failed to fetch project. Please try again later.' },
+      { error: 'Failed to fetch project. Please try again later.', details: errorMessage },
       { status: 500 }
     );
   }
@@ -82,11 +95,21 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    console.log('PUT /api/projects/[id] - Starting request');
+
+    if (!process.env.DATABASE_URL) {
+      console.error('DATABASE_URL is not set');
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+    }
+
     const session = await auth();
+    console.log('Session:', session ? 'authenticated' : 'not authenticated');
+
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     const userId = session.user.id;
+    console.log('User ID:', userId);
 
     const { id } = await params;
     const body = await request.json();
@@ -169,8 +192,11 @@ export async function PUT(
     return NextResponse.json({ project: dbProjectToAppProject(parsed) });
   } catch (error) {
     console.error('Update project error:', error);
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack');
+
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { error: 'Failed to update project. Please check your input and try again.' },
+      { error: 'Failed to update project. Please check your input and try again.', details: errorMessage },
       { status: 500 }
     );
   }
