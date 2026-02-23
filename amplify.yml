@@ -1,0 +1,25 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - npm ci --cache .npm --prefer-offline
+    build:
+      commands:
+        - echo "DATABASE_URL=$DATABASE_URL" >> .env.production
+        - echo "NEXTAUTH_SECRET=$NEXTAUTH_SECRET" >> .env.production
+        - echo "AUTH_SECRET=$AUTH_SECRET" >> .env.production
+        - echo "AUTH_TRUST_HOST=$AUTH_TRUST_HOST" >> .env.production
+        - echo "NEXTAUTH_URL=$NEXTAUTH_URL" >> .env.production
+        - echo "AUTH_URL=$NEXTAUTH_URL" >> .env.production
+        - echo "RESEND_API_KEY=$RESEND_API_KEY" >> .env.production
+        - echo "EMAIL_FROM=$EMAIL_FROM" >> .env.production
+        - npm run build
+  artifacts:
+    baseDirectory: .next
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - .next/cache/**/*
+      - .npm/**/*
