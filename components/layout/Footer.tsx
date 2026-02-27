@@ -111,11 +111,6 @@ export function Footer({ variant = 'default' }: FooterProps) {
             </h4>
             <ul className="space-y-3">
               <li>
-                <Link href="/about" className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
-                  About Us
-                </Link>
-              </li>
-              <li>
                 <Link href="/contact" className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
                   Contact
                 </Link>
