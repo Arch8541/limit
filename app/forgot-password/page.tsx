@@ -16,11 +16,22 @@ export default function ForgotPasswordPage() {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate API call - TODO: implement actual password reset
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
 
-    setIsSubmitted(true);
-    setIsLoading(false);
+      // Always show success to prevent email enumeration
+      setIsSubmitted(true);
+    } catch (error) {
+      console.error('Forgot password error:', error);
+      // Still show success to prevent email enumeration
+      setIsSubmitted(true);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -101,7 +112,7 @@ export default function ForgotPasswordPage() {
         </Card>
 
         <p className="mt-8 text-xs text-[var(--text-muted)] text-center">
-          Password reset functionality coming soon.
+          Reset links expire after 1 hour for security.
         </p>
       </div>
     </div>

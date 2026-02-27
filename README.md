@@ -1,68 +1,42 @@
 # LIMIT - Building Regulation Compliance Platform
 
-Professional SaaS platform for GDCR 2017 (Gujarat Development Control Regulations) compliance analysis in Gujarat/Ahmedabad.
-
-## Overview
-
-LIMIT helps architects, developers, and investors analyze building regulations for construction projects in Ahmedabad. The platform calculates FSI, height limits, setbacks, parking requirements, and other GDCR 2017 parameters automatically.
+Professional SaaS platform for GDCR 2017 (Gujarat Development Control Regulations) compliance analysis.
 
 ## Features
 
-- **Project Management**: Create, view, edit, and delete building regulation projects
-- **GDCR 2017 Compliance**: Automated calculation of all major regulatory parameters
-- **Interactive Map Drawing**: Draw plot boundaries using Leaflet and Leaflet Draw
-- **3D Visualization**: Interactive 3D building visualization
-- **Professional PDF Reports**: Generate detailed PDF reports
-- **Bulk Analysis**: Process multiple sites simultaneously
-- **Comparative Analysis**: Compare multiple projects side-by-side
-- **User Authentication**: Secure login/register with NextAuth v5
+- **GDCR 2017 Compliance**: Automated calculation of FSI, height limits, setbacks, parking, and more
+- **Interactive Map**: Draw plot boundaries using Leaflet
+- **PDF Reports**: Generate professional compliance reports
+- **Project Management**: Create, edit, and manage multiple projects
+- **User Authentication**: Secure login with NextAuth v5
 
 ## Tech Stack
 
 - **Framework**: Next.js 16 (App Router), TypeScript
+- **Database**: Supabase PostgreSQL with Prisma ORM
+- **Hosting**: AWS Amplify (Mumbai)
+- **Auth**: NextAuth v5
 - **Styling**: Tailwind CSS v4
-- **Authentication**: NextAuth v5 with Prisma Adapter
-- **Database**: Prisma ORM (SQLite dev / PostgreSQL production)
-- **Maps**: Leaflet with React-Leaflet
-- **Forms**: React Hook Form with Zod validation
-- **PDF**: @react-pdf/renderer
-- **Email**: React Email with Resend
+- **Email**: Resend
 
-## Project Structure
-
-```
-limit/
-├── app/                    # Next.js App Router (pages, API routes)
-├── components/             # UI components (ui, 3d, dashboard, forms, etc.)
-├── lib/                    # Business logic (auth, calculations, regulations, db, etc.)
-├── prisma/                 # Database schema and migrations
-├── types/                  # TypeScript type definitions
-├── auth.ts                 # NextAuth configuration
-├── middleware.ts           # Route protection
-└── package.json            # Dependencies
-```
-
-## Getting Started
+## Quick Start
 
 ### Prerequisites
 - Node.js 18+
-- npm or yarn
+- npm
 
-### Installation
+### Local Development
 
 ```bash
-# Clone and install
-git clone <repository-url>
-cd limit
+# Install dependencies
 npm install
 
 # Setup environment
 cp .env.example .env
-# Edit .env with your configuration
+# Edit .env with your Supabase credentials
 
-# Setup database
+# Generate Prisma client
 npx prisma generate
-npx prisma migrate dev
 
 # Run development server
 npm run dev
@@ -73,113 +47,87 @@ Open [http://localhost:3000](http://localhost:3000)
 ### Environment Variables
 
 ```env
-# Required
-DATABASE_URL="file:./dev.db"                    # SQLite for dev
+# Database (Supabase)
+DATABASE_URL="postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres"
+
+# Authentication
+NEXTAUTH_SECRET="generate-with-openssl-rand-base64-32"
 NEXTAUTH_URL="http://localhost:3000"
-NEXTAUTH_SECRET="<generate-with-openssl>"       # openssl rand -base64 32
-JWT_SECRET="<generate-with-openssl>"
+AUTH_SECRET="same-as-nextauth-secret"
+AUTH_TRUST_HOST="true"
 
-# Optional
-GOOGLE_CLIENT_ID=""
-GOOGLE_CLIENT_SECRET=""
+# Email (Optional)
 RESEND_API_KEY=""
+EMAIL_FROM="LIMIT <noreply@yourdomain.com>"
 ```
 
-### Production Deployment
+## Deployment
 
-For Vercel:
-1. Set environment variables in Vercel dashboard
-2. Use PostgreSQL for `DATABASE_URL`
-3. Deploy via GitHub or `vercel` CLI
-4. Run `npx prisma migrate deploy`
+### AWS Amplify
 
-## Usage
+The app is configured for AWS Amplify deployment:
 
-### Creating a Project
-1. Click "New Project" from dashboard
-2. Fill in site information (name, address, zone, authority)
-3. Define plot dimensions:
-   - Manual entry (length, width, area)
-   - Interactive map drawing (recommended)
-4. Enter road width(s) and special conditions
-5. Click "Calculate Regulations"
-6. View results and generate PDF report
+1. Connect your GitHub repository to AWS Amplify
+2. Set environment variables in Amplify Console:
+   - `DATABASE_URL` - Supabase pooler connection string
+   - `NEXTAUTH_SECRET` - Auth secret
+   - `NEXTAUTH_URL` - Your Amplify app URL
+   - `AUTH_SECRET` - Same as NEXTAUTH_SECRET
+   - `AUTH_TRUST_HOST` - `true`
+3. Deploy
 
-### Key Calculations
-- **FSI**: Base FSI, Premium FSI, corner plot bonus
-- **Height**: Formula-based with zone limits
-- **Setbacks**: Front, side, and rear setbacks
-- **Ground Coverage**: Zone-specific percentages
-- **Parking**: ECS calculation by use type
-- **Fire Safety**: Height-based requirements
-- **Accessibility**: Ramps and lift requirements
+Build configuration is in `amplify.yml`.
 
-## Development
+### Database (Supabase)
 
-### Available Commands
+1. Create a project at [supabase.com](https://supabase.com)
+2. Get connection string from Settings > Database
+3. Use the **pooler** connection (port 6543) for serverless environments
+4. Run migrations: `npx prisma migrate deploy`
 
-```bash
-npm run dev              # Start dev server
-npm run build            # Production build
-npm run lint             # Run ESLint
+## Project Structure
 
-npx prisma studio        # Database GUI
-npx prisma migrate dev   # Create migration
-npx prisma format        # Format schema
 ```
-
-### Architecture
-
-- **Authentication**: NextAuth v5 with JWT and Prisma
-- **Database**: Prisma ORM with type-safe queries
-- **API**: Next.js API routes with validation
-- **Forms**: React Hook Form + Zod schemas
-- **State**: React hooks and URL parameters
+limit/
+├── app/                # Next.js pages and API routes
+├── components/         # React components
+├── lib/                # Business logic and utilities
+├── prisma/             # Database schema
+├── types/              # TypeScript definitions
+├── auth.ts             # NextAuth configuration
+├── middleware.ts       # Route protection
+└── amplify.yml         # AWS Amplify build config
+```
 
 ## GDCR 2017 Coverage
 
-- Clause 7.2 - Floor Space Index
-- Clause 7.3 - Building Height
-- Clause 7.4 - Setback Requirements
-- Clause 7.5 - Ground Coverage
-- Clause 8.1 - Structural Requirements
-- Clause 11.1 - Fire Safety Norms
-- Clause 12.1 - Parking Norms
-- Clause 13.1 - Accessibility Standards
+| Clause | Description |
+|--------|-------------|
+| 7.2 | Floor Space Index (FSI) |
+| 7.3 | Building Height |
+| 7.4 | Setback Requirements |
+| 7.5 | Ground Coverage |
+| 11.1 | Fire Safety |
+| 12.1 | Parking Norms |
+| 13.1 | Accessibility |
 
-## Supported Zones
+**Supported Zones**: R1, R2, Commercial, Industrial, Mixed-Use
+**Authorities**: AUDA, AMC
 
-- R1, R2 (Residential)
-- Commercial
-- Industrial
-- Mixed-Use
+## Commands
 
-## Authorities
+```bash
+npm run dev          # Development server
+npm run build        # Production build
+npm run lint         # ESLint
+npx prisma studio    # Database GUI
+npx prisma migrate   # Run migrations
+```
 
-- AUDA (Ahmedabad Urban Development Authority)
-- AMC (Ahmedabad Municipal Corporation)
+## Disclaimer
 
-## Security
-
-### Production Checklist
-- [ ] Set secure `NEXTAUTH_SECRET` and `JWT_SECRET`
-- [ ] Use PostgreSQL (not SQLite)
-- [ ] Enable HTTPS (automatic on Vercel)
-- [ ] Never commit secrets to git
-- [ ] Run `npm audit` regularly
-
-## Important Disclaimer
-
-**This is an advisory tool only.** All calculations must be verified with local authorities (AUDA/AMC) before construction. No liability is assumed for decisions based on these reports. Always consult licensed professionals.
-
-## Support
-
-- **Technical Issues**: Check `docs/` folder or open GitHub issue
-- **GDCR Compliance**: Consult AUDA/AMC or licensed architect
-- **Documentation**: See `CLAUDE.md`, `UI_DESIGN_GUIDE.md`
+This is an advisory tool only. All calculations must be verified with local authorities (AUDA/AMC) before construction.
 
 ---
 
-**LIMIT Platform** - Building Regulation Compliance Made Simple
-
-*Built with Next.js 16, TypeScript, Prisma, and NextAuth v5*
+**LIMIT Platform** - Building Regulation Made Simple

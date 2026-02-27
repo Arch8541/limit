@@ -9,7 +9,7 @@ if (process.env.NODE_ENV === 'production') {
     console.error('CRITICAL: NEXTAUTH_SECRET must be set to a secure value in production!');
   }
   if (!process.env.NEXTAUTH_URL || process.env.NEXTAUTH_URL.includes('localhost')) {
-    console.error('CRITICAL: NEXTAUTH_URL must be set to your production domain (e.g., https://your-app.vercel.app)');
+    console.error('CRITICAL: NEXTAUTH_URL must be set to your production domain (e.g., https://your-app.amplifyapp.com)');
   }
   if (!process.env.DATABASE_URL || !process.env.DATABASE_URL.includes('postgresql')) {
     console.error('CRITICAL: DATABASE_URL must be set to a PostgreSQL connection string for production!');
@@ -17,7 +17,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  trustHost: true, // Required for Vercel deployment
+  trustHost: true, // Required for AWS Amplify deployment
   session: {
     strategy: 'jwt',
     maxAge: 7 * 24 * 60 * 60, // 7 days

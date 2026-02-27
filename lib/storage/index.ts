@@ -6,44 +6,56 @@ export const STORAGE_KEYS = {
   PROJECTS: 'limit_projects',
 } as const;
 
+// Check if localStorage is available
+function isLocalStorageAvailable(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    const testKey = '__storage_test__';
+    window.localStorage.setItem(testKey, testKey);
+    window.localStorage.removeItem(testKey);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 // Generic storage functions
 export function setItem<T>(key: string, value: T): void {
-  if (typeof window === 'undefined') return;
+  if (!isLocalStorageAvailable()) return;
   try {
     localStorage.setItem(key, JSON.stringify(value));
   } catch (error) {
-    console.error('Error saving to localStorage:', error);
+    // Silently fail - localStorage not available
   }
 }
 
 export function getItem<T>(key: string): T | null {
-  if (typeof window === 'undefined') return null;
+  if (!isLocalStorageAvailable()) return null;
   try {
     const item = localStorage.getItem(key);
     return item ? JSON.parse(item) : null;
-  } catch (error) {
-    console.error('Error reading from localStorage:', error);
+  } catch {
     return null;
   }
 }
 
 export function removeItem(key: string): void {
-  if (typeof window === 'undefined') return;
+  if (!isLocalStorageAvailable()) return;
   try {
     localStorage.removeItem(key);
-  } catch (error) {
-    console.error('Error removing from localStorage:', error);
+  } catch {
+    // Silently fail
   }
 }
 
 export function clearStorage(): void {
-  if (typeof window === 'undefined') return;
+  if (!isLocalStorageAvailable()) return;
   try {
     Object.values(STORAGE_KEYS).forEach(key => {
       localStorage.removeItem(key);
     });
-  } catch (error) {
-    console.error('Error clearing localStorage:', error);
+  } catch {
+    // Silently fail
   }
 }
 

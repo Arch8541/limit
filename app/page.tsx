@@ -3,10 +3,12 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 import { Button } from '@/components/ui/Button';
 import { Card, FeatureCard } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
-import { isAuthenticated } from '@/lib/auth';
+import { Footer } from '@/components/layout/Footer';
+import { HeroBuilding } from '@/components/3d/HeroBuilding';
 import {
   Building2,
   FileCheck,
@@ -28,16 +30,22 @@ import {
 
 export default function LandingPage() {
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    if (isAuthenticated()) {
+  }, []);
+
+  useEffect(() => {
+    // Redirect to dashboard if authenticated
+    if (status === 'authenticated' && session?.user) {
       router.push('/dashboard');
     }
-  }, [router]);
+  }, [status, session, router]);
 
-  if (!mounted) {
+  // Show nothing while checking auth status or not mounted
+  if (!mounted || status === 'loading') {
     return null;
   }
 
@@ -174,65 +182,73 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative section-spacing">
+      <section className="relative section-spacing overflow-hidden">
         <div className="container-wide">
-          <div className="max-w-4xl mx-auto text-center stagger-children">
-            {/* Badge */}
-            <Badge variant="accent" size="md" className="mb-8">
-              <Sparkles className="w-3.5 h-3.5" />
-              GDCR 2017 Compliance Platform
-            </Badge>
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+            {/* Left: Text content */}
+            <div className="stagger-children text-center lg:text-left">
+              {/* Badge */}
+              <Badge variant="accent" size="md" className="mb-8">
+                <Sparkles className="w-3.5 h-3.5" />
+                GDCR 2017 Compliance Platform
+              </Badge>
 
-            {/* Headline */}
-            <h1 className="heading-display text-[var(--text-primary)] mb-6">
-              Building Regulation{' '}
-              <span className="text-gradient font-normal">Made Simple</span>
-            </h1>
+              {/* Headline */}
+              <h1 className="heading-display text-[var(--text-primary)] mb-6">
+                Building Regulation{' '}
+                <span className="text-gradient font-normal">Made Simple</span>
+              </h1>
 
-            {/* Subheadline */}
-            <p className="body-large max-w-2xl mx-auto mb-10 text-balance">
-              Professional SaaS platform for instant GDCR 2017 compliance analysis in Gujarat.
-              Get comprehensive regulatory reports in minutes, not hours.
-            </p>
+              {/* Subheadline */}
+              <p className="body-large max-w-xl mb-10 text-balance mx-auto lg:mx-0">
+                Professional SaaS platform for instant GDCR 2017 compliance analysis in Gujarat.
+                Get comprehensive regulatory reports in minutes, not hours.
+              </p>
 
-            {/* CTA buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-              <Button variant="primary" size="lg" onClick={() => router.push('/register')}>
-                Start Free Analysis
-                <ArrowRight className="w-5 h-5" />
-              </Button>
-              <Button variant="secondary" size="lg" onClick={() => router.push('/login')}>
-                View Demo Project
-              </Button>
+              {/* CTA buttons */}
+              <div className="flex flex-col sm:flex-row items-center lg:items-start justify-center lg:justify-start gap-4 mb-12">
+                <Button variant="primary" size="lg" onClick={() => router.push('/register')}>
+                  Start Free Analysis
+                  <ArrowRight className="w-5 h-5" />
+                </Button>
+                <Button variant="secondary" size="lg" onClick={() => router.push('/login')}>
+                  View Demo Project
+                </Button>
+              </div>
+
+              {/* Stats */}
+              <div className="grid grid-cols-3 gap-6 max-w-md mx-auto lg:mx-0">
+                <div className="text-center lg:text-left">
+                  <div className="text-3xl font-bold text-gradient mb-1">5 min</div>
+                  <div className="text-xs text-[var(--text-tertiary)] font-mono uppercase tracking-wider">
+                    Avg. Report
+                  </div>
+                </div>
+                <div className="text-center lg:text-left">
+                  <div className="text-3xl font-bold text-gradient mb-1">100%</div>
+                  <div className="text-xs text-[var(--text-tertiary)] font-mono uppercase tracking-wider">
+                    GDCR Compliant
+                  </div>
+                </div>
+                <div className="text-center lg:text-left">
+                  <div className="text-3xl font-bold text-gradient mb-1">500+</div>
+                  <div className="text-xs text-[var(--text-tertiary)] font-mono uppercase tracking-wider">
+                    Sites Analyzed
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto">
-              <div className="text-center">
-                <div className="text-4xl font-bold text-gradient mb-1">5 min</div>
-                <div className="text-sm text-[var(--text-tertiary)] font-mono uppercase tracking-wider">
-                  Avg. Report Time
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-gradient mb-1">100%</div>
-                <div className="text-sm text-[var(--text-tertiary)] font-mono uppercase tracking-wider">
-                  GDCR Compliant
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-gradient mb-1">500+</div>
-                <div className="text-sm text-[var(--text-tertiary)] font-mono uppercase tracking-wider">
-                  Sites Analyzed
-                </div>
-              </div>
+            {/* Right: 3D Building Animation */}
+            <div className="hidden lg:flex items-center justify-center relative">
+              <HeroBuilding />
             </div>
           </div>
         </div>
 
         {/* Decorative elements */}
-        <div className="absolute top-1/2 left-0 w-64 h-64 bg-[var(--accent-glow)] rounded-full blur-[100px] -translate-y-1/2 opacity-50" />
-        <div className="absolute top-1/3 right-0 w-96 h-96 bg-[var(--blueprint-subtle)] rounded-full blur-[120px] opacity-40" />
+        <div className="absolute top-1/2 left-0 w-64 h-64 bg-[var(--accent-glow)] rounded-full blur-[100px] -translate-y-1/2 opacity-40" />
+        <div className="absolute top-1/4 right-[10%] w-80 h-80 bg-[var(--blueprint-subtle)] rounded-full blur-[100px] opacity-30" />
       </section>
 
       {/* Features Section */}
@@ -411,43 +427,7 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="relative border-t border-[var(--border-subtle)] py-12">
-        <div className="container-wide">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            {/* Logo */}
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-[var(--radius-md)] bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center">
-                <Building2 className="w-4 h-4 text-[var(--bg-primary)]" />
-              </div>
-              <span className="font-bold">LIMIT</span>
-              <span className="text-[var(--text-muted)] text-sm">|</span>
-              <span className="text-[var(--text-muted)] text-sm">Building Compliance Platform</span>
-            </div>
-
-            {/* Links */}
-            <div className="flex items-center gap-6 text-sm text-[var(--text-secondary)]">
-              <a href="#" className="hover:text-[var(--text-primary)] transition-colors">Privacy</a>
-              <a href="#" className="hover:text-[var(--text-primary)] transition-colors">Terms</a>
-              <a href="#" className="hover:text-[var(--text-primary)] transition-colors">Contact</a>
-            </div>
-
-            {/* Copyright */}
-            <div className="text-sm text-[var(--text-muted)]">
-              © 2026 LIMIT. All rights reserved.
-            </div>
-          </div>
-
-          {/* Disclaimer */}
-          <div className="mt-8 pt-6 border-t border-[var(--border-subtle)]">
-            <p className="text-xs text-[var(--text-muted)] text-center max-w-3xl mx-auto leading-relaxed">
-              <strong className="text-[var(--text-tertiary)]">Disclaimer:</strong> LIMIT is an advisory tool only.
-              All calculations and reports should be verified with local authorities and licensed professionals
-              before proceeding with construction. This platform does not replace professional architectural
-              or engineering services.
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

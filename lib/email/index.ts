@@ -174,3 +174,71 @@ export async function sendWelcomeEmail({
     html,
   });
 }
+
+export async function sendPasswordResetEmail(
+  to: string,
+  token: string,
+  name: string
+): Promise<boolean> {
+  const resetUrl = `${NEXTAUTH_URL}/reset-password?token=${token}`;
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reset Your Password</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #0C0C0E;">
+  <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+    <div style="background: #121214; border-radius: 20px; padding: 40px; border: 1px solid rgba(255,255,255,0.1);">
+      <div style="text-align: center; margin-bottom: 32px;">
+        <div style="display: inline-block; background: linear-gradient(135deg, #F59E0B, #D97706); width: 64px; height: 64px; border-radius: 16px; margin-bottom: 16px; line-height: 64px; text-align: center;">
+          <span style="color: #0C0C0E; font-size: 32px; font-weight: bold;">L</span>
+        </div>
+        <h1 style="margin: 0; font-size: 28px; color: #FAFAFA; font-weight: 800;">LIMIT Platform</h1>
+      </div>
+
+      <h2 style="color: #FAFAFA; font-size: 24px; margin-bottom: 16px;">Hi ${name},</h2>
+
+      <p style="color: #D4D4D8; font-size: 16px; line-height: 1.6; margin-bottom: 24px;">
+        We received a request to reset your password. Click the button below to create a new password.
+      </p>
+
+      <div style="text-align: center; margin: 32px 0;">
+        <a href="${resetUrl}" style="display: inline-block; background: linear-gradient(135deg, #F59E0B, #D97706); color: #0C0C0E; text-decoration: none; padding: 16px 40px; border-radius: 12px; font-weight: 600; font-size: 16px;">
+          Reset Password
+        </a>
+      </div>
+
+      <p style="color: #A1A1AA; font-size: 14px; line-height: 1.6; margin-top: 32px;">
+        If the button doesn't work, copy and paste this link into your browser:
+      </p>
+      <p style="color: #F59E0B; font-size: 14px; word-break: break-all;">
+        ${resetUrl}
+      </p>
+
+      <div style="margin-top: 40px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.1);">
+        <p style="color: #71717A; font-size: 12px; line-height: 1.6; margin: 0;">
+          This password reset link will expire in 1 hour. If you didn't request a password reset, you can safely ignore this email - your password will remain unchanged.
+        </p>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 24px;">
+      <p style="color: #71717A; font-size: 12px;">
+        LIMIT - Building Regulation Compliance Platform
+      </p>
+    </div>
+  </div>
+</body>
+</html>
+  `.trim();
+
+  return sendEmail({
+    to,
+    subject: 'Reset your password - LIMIT Platform',
+    html,
+  });
+}

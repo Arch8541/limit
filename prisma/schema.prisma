@@ -1,4 +1,4 @@
-// Prisma Schema for LIMIT Platform - AWS RDS PostgreSQL Optimized
+// Prisma Schema for LIMIT Platform - Supabase PostgreSQL
 // Version: 2.0.0 - Production Ready
 
 generator client {
@@ -7,8 +7,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // ============================================================================
