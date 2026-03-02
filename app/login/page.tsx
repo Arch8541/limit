@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { signIn } from 'next-auth/react';
+import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -42,23 +42,14 @@ function LoginForm() {
     setIsLoading(true);
 
     try {
-      const result = await signIn('credentials', {
-        email,
-        password,
-        redirect: false,
-      });
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
 
-      if (result?.error) {
-        if (result.error.includes('EMAIL_NOT_VERIFIED')) {
-          setError('Please verify your email address before logging in.');
-        } else {
-          setError('Invalid email or password. Please try again.');
-        }
-      } else if (result?.ok) {
+      if (error) {
+        setError('Invalid email or password. Please try again.');
+      } else {
         router.push('/dashboard');
         router.refresh();
-      } else {
-        setError('Login failed. Please try again.');
       }
     } catch (err) {
       console.error('Login error:', err);

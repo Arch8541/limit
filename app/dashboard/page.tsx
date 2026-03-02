@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSession, signOut } from 'next-auth/react';
+import { createClient } from '@/lib/supabase/client';
+import { User } from '@supabase/supabase-js';
 import Link from 'next/link';
 import { getUserProjects, deleteProject } from '@/lib/storage/projects-api';
 import { Project } from '@/types';
@@ -32,7 +33,8 @@ import {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const [user, setUser] = useState<User | null>(null);
+  const [status, setStatus] = useState<'loading' | 'authenticated' | 'unauthenticated'>('loading');
   const [projects, setProjects] = useState<Project[]>([]);
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -42,28 +44,34 @@ export default function DashboardPage() {
   const [navigatingTo, setNavigatingTo] = useState<string | null>(null);
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/login');
-      return;
-    }
-
-    if (status === 'authenticated' && session?.user) {
-      loadProjects();
-    }
-  }, [status, session, router]);
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) {
+        router.push('/login');
+        return;
+      }
+      setUser(user);
+      setStatus('authenticated');
+      loadProjectsForUser(user.id);
+    });
+  }, [router]);
 
   const loadProjects = async () => {
-    if (session?.user?.id) {
-      setIsLoadingProjects(true);
-      try {
-        const userProjects = await getUserProjects(session.user.id);
-        setProjects(userProjects);
-        setFilteredProjects(userProjects);
-      } catch (error) {
-        console.error('Failed to load projects:', error);
-      } finally {
-        setIsLoadingProjects(false);
-      }
+    if (user?.id) {
+      await loadProjectsForUser(user.id);
+    }
+  };
+
+  const loadProjectsForUser = async (userId: string) => {
+    setIsLoadingProjects(true);
+    try {
+      const userProjects = await getUserProjects(userId);
+      setProjects(userProjects);
+      setFilteredProjects(userProjects);
+    } catch (error) {
+      console.error('Failed to load projects:', error);
+    } finally {
+      setIsLoadingProjects(false);
     }
   };
 
@@ -106,7 +114,8 @@ export default function DashboardPage() {
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
-      await signOut({ redirect: false });
+      const supabase = createClient();
+      await supabase.auth.signOut();
       router.push('/');
       router.refresh();
     } catch (error) {
@@ -133,11 +142,9 @@ export default function DashboardPage() {
     );
   }
 
-  if (!session?.user) {
+  if (!user) {
     return null;
   }
-
-  const user = session.user;
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)]">
@@ -178,13 +185,13 @@ export default function DashboardPage() {
             <div className="flex items-center gap-4">
               {/* User info */}
               <div className="hidden sm:block text-right">
-                <p className="text-sm font-medium text-[var(--text-primary)]">{user?.name}</p>
+                <p className="text-sm font-medium text-[var(--text-primary)]">{user?.user_metadata?.name || user?.email}</p>
                 <p className="text-xs text-[var(--text-muted)]">{user?.email}</p>
               </div>
 
               {/* User avatar */}
               <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center text-[var(--bg-primary)] font-bold text-sm">
-                {user?.name?.charAt(0) || user?.email?.charAt(0) || 'U'}
+                {(user?.user_metadata?.name || user?.email || 'U').charAt(0).toUpperCase()}
               </div>
 
               {/* Logout */}

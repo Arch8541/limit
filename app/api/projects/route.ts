@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
-import { auth } from '@/auth';
+import { createClient } from '@/lib/supabase/server';
 import { dbProjectToAppProject } from '@/lib/db/converters';
 import { z } from 'zod';
 
@@ -14,13 +14,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
     }
 
-    const session = await auth();
-    console.log('Session:', session ? 'authenticated' : 'not authenticated');
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!session?.user?.id) {
+    if (!user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    const userId = session.user.id;
+    const userId = user.id;
     console.log('User ID:', userId);
 
     const dbProjects = await prisma.project.findMany({
@@ -119,13 +119,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
     }
 
-    const session = await auth();
-    console.log('Session:', session ? 'authenticated' : 'not authenticated');
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!session?.user?.id) {
+    if (!user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    const userId = session.user.id;
+    const userId = user.id;
     console.log('User ID:', userId);
 
     const body = await request.json();

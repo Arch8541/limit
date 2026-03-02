@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { createClient } from '@/lib/supabase/client';
 import { createProject, addRegulationResults } from '@/lib/storage/projects-api';
 import { calculateRegulations } from '@/lib/calculations/regulation-engine';
 import { SiteData, Authority, Zone, IntendedUse } from '@/types';
@@ -17,7 +17,6 @@ import { Building2, ArrowLeft, Save, Calculator } from 'lucide-react';
 
 export default function NewProjectPage() {
   const router = useRouter();
-  const { data: session, status } = useSession();
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
@@ -58,7 +57,8 @@ export default function NewProjectPage() {
     setIsLoading(true);
 
     try {
-      if (!session?.user?.id) {
+      const { data: { user } } = await createClient().auth.getUser();
+      if (!user?.id) {
         router.push('/login');
         return;
       }
@@ -123,7 +123,7 @@ export default function NewProjectPage() {
       };
 
       // Create project
-      const project = await createProject(session.user.id, siteData);
+      const project = await createProject(user.id, siteData);
 
       // Calculate regulations
       const { result, clauses } = calculateRegulations(siteData);

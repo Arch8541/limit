@@ -1,46 +1,48 @@
-import { auth } from '@/auth';
-import { NextResponse } from 'next/server';
+import { createServerClient } from '@supabase/ssr'
+import { NextResponse, type NextRequest } from 'next/server'
 
-export default auth((req) => {
-  const isLoggedIn = !!req.auth;
-  const pathname = req.nextUrl.pathname;
+export async function middleware(request: NextRequest) {
+  let supabaseResponse = NextResponse.next({ request })
 
-  const isAuthPage = pathname.startsWith('/login') || pathname.startsWith('/register');
-  const isProtectedPage = pathname.startsWith('/dashboard') || pathname.startsWith('/projects') || pathname.startsWith('/bulk-analysis');
-  const isPublicPage = pathname === '/';
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+          supabaseResponse = NextResponse.next({ request })
+          cookiesToSet.forEach(({ name, value, options }) =>
+            supabaseResponse.cookies.set(name, value, options)
+          )
+        },
+      },
+    }
+  )
 
-  // Debug logging
-  if (process.env.NODE_ENV === 'development') {
-    console.log('Middleware:', {
-      pathname,
-      isLoggedIn,
-      userId: req.auth?.user?.id,
-      isAuthPage,
-      isProtectedPage,
-      isPublicPage,
-    });
+  const { data: { user } } = await supabase.auth.getUser()
+  const pathname = request.nextUrl.pathname
+
+  const isAuthPage = pathname.startsWith('/login') || pathname.startsWith('/register')
+  const isProtectedPage =
+    pathname.startsWith('/dashboard') ||
+    pathname.startsWith('/projects') ||
+    pathname.startsWith('/bulk-analysis')
+
+  if (isProtectedPage && !user) {
+    return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  // Allow public pages without any redirects
-  if (isPublicPage) {
-    return NextResponse.next();
+  if (isAuthPage && user) {
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
-  // Redirect unauthenticated users from protected pages
-  if (isProtectedPage && !isLoggedIn) {
-    console.log('Redirecting to login - protected page accessed without auth');
-    return NextResponse.redirect(new URL('/login', req.url));
-  }
-
-  // Redirect authenticated users away from auth pages
-  if (isAuthPage && isLoggedIn) {
-    console.log('Redirecting to dashboard - auth page accessed while logged in');
-    return NextResponse.redirect(new URL('/dashboard', req.url));
-  }
-
-  return NextResponse.next();
-});
+  return supabaseResponse
+}
 
 export const config = {
   matcher: ['/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)'],
-};
+}

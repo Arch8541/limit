@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, Suspense } from 'react';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -10,8 +11,6 @@ import { Building2, Lock, CheckCircle2, AlertCircle, ArrowLeft } from 'lucide-re
 
 function ResetPasswordForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const token = searchParams.get('token');
 
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -29,11 +28,6 @@ function ResetPasswordForm() {
     e.preventDefault();
     setError('');
 
-    if (!token) {
-      setError('Invalid reset link. Please request a new password reset.');
-      return;
-    }
-
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
@@ -47,20 +41,16 @@ function ResetPasswordForm() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/auth/reset-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, password }),
-      });
+      const supabase = createClient();
+      const { error: updateError } = await supabase.auth.updateUser({ password });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.error || 'Failed to reset password');
+      if (updateError) {
+        setError(updateError.message || 'Failed to reset password');
         setIsLoading(false);
         return;
       }
 
+      await supabase.auth.signOut();
       setSuccess(true);
     } catch (err) {
       console.error('Reset password error:', err);
@@ -69,36 +59,6 @@ function ResetPasswordForm() {
       setIsLoading(false);
     }
   };
-
-  if (!token) {
-    return (
-      <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center p-6">
-        <div className="fixed inset-0 bg-gradient-mesh pointer-events-none" />
-        <div className="w-full max-w-md relative z-10">
-          <Card variant="elevated" padding="lg">
-            <CardContent>
-              <div className="text-center py-6">
-                <div className="w-16 h-16 rounded-full bg-[var(--error-bg)] flex items-center justify-center mx-auto mb-4">
-                  <AlertCircle className="w-8 h-8 text-[var(--error)]" />
-                </div>
-                <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">
-                  Invalid Reset Link
-                </h3>
-                <p className="text-[var(--text-secondary)] text-sm mb-6">
-                  This password reset link is invalid or has expired. Please request a new one.
-                </p>
-                <Link href="/forgot-password">
-                  <Button variant="primary" size="lg" fullWidth>
-                    Request New Link
-                  </Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
-  }
 
   if (success) {
     return (

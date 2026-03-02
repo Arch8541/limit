@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useSession } from 'next-auth/react';
+import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import { Card, FeatureCard } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
@@ -30,22 +30,17 @@ import {
 
 export default function LandingPage() {
   const router = useRouter();
-  const { data: session, status } = useSession();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) router.push('/dashboard');
+    });
+  }, [router]);
 
-  useEffect(() => {
-    // Redirect to dashboard if authenticated
-    if (status === 'authenticated' && session?.user) {
-      router.push('/dashboard');
-    }
-  }, [status, session, router]);
-
-  // Show nothing while checking auth status or not mounted
-  if (!mounted || status === 'loading') {
+  if (!mounted) {
     return null;
   }
 

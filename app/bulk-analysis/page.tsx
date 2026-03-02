@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { createClient } from '@/lib/supabase/client';
+import { User } from '@supabase/supabase-js';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
 import { Building2, ArrowLeft, Upload, Download, FileSpreadsheet, AlertCircle, CheckCircle2 } from 'lucide-react';
@@ -16,8 +17,13 @@ import { createProject, addRegulationResults } from '@/lib/storage/projects-api'
 
 export default function BulkAnalysisPage() {
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const [user, setUser] = useState<User | null>(null);
   const [csvFile, setCsvFile] = useState<File | null>(null);
+
+  // Get authenticated user on mount (middleware already protects this route)
+  useState(() => {
+    createClient().auth.getUser().then(({ data: { user } }) => setUser(user));
+  });
   const [isProcessing, setIsProcessing] = useState(false);
   const [processedProjects, setProcessedProjects] = useState<Project[]>([]);
   const [progress, setProgress] = useState(0);
@@ -46,7 +52,7 @@ export default function BulkAnalysisPage() {
     setProgress(0);
 
     try {
-      if (!session?.user?.id) {
+      if (!user?.id) {
         throw new Error('Please login to use bulk analysis');
       }
 
@@ -65,7 +71,7 @@ export default function BulkAnalysisPage() {
         const siteData = csvRowToSiteData(row);
 
         // Create project
-        const project = await createProject(session.user.id, siteData);
+        const project = await createProject(user.id, siteData);
 
         // Calculate regulations
         const { result, clauses } = calculateRegulations(siteData);
