@@ -3,11 +3,17 @@ import { NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   const envVars = {
     DATABASE_URL: !!process.env.DATABASE_URL,
     DIRECT_URL: !!process.env.DIRECT_URL,
-    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || 'not set',
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    NEXT_PUBLIC_SUPABASE_URL: supabaseUrl
+      ? `SET — ${supabaseUrl.slice(0, 35)}...`
+      : 'NOT SET',
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: supabaseKey
+      ? `SET — ${supabaseKey.slice(0, 12)}... (${supabaseKey.length} chars)`
+      : 'NOT SET',
     NODE_ENV: process.env.NODE_ENV || 'not set',
   };
 

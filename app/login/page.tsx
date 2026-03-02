@@ -23,16 +23,23 @@ function LoginForm() {
     if (searchParams.get('verified') === 'true') {
       setSuccessMessage('Email verified successfully! You can now login.');
     } else if (searchParams.get('registered') === 'true') {
-      setSuccessMessage('Registration successful! You can now login to your account.');
+      setSuccessMessage('Account created! Please check your email to confirm your account before logging in.');
     }
 
     const verifyError = searchParams.get('error');
+    const reason = searchParams.get('reason');
     if (verifyError === 'invalid_token') {
       setError('Invalid or expired verification link. Please register again.');
     } else if (verifyError === 'token_expired') {
       setError('Verification link has expired. Please register again.');
     } else if (verifyError === 'verification_failed') {
       setError('Email verification failed. Please try again or contact support.');
+    } else if (verifyError === 'supabase_not_configured') {
+      setError('Server configuration error: Supabase environment variables are not set. Contact support.');
+    } else if (verifyError === 'auth_callback_error') {
+      setError(reason
+        ? `Email confirmation failed: ${reason}`
+        : 'Email confirmation failed. The link may have expired — please register again.');
     }
   }, [searchParams]);
 

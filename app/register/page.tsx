@@ -18,6 +18,7 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [registered, setRegistered] = useState(false);
 
   const passwordRequirements = [
     { met: password.length >= 8, text: 'At least 8 characters' },
@@ -48,7 +49,7 @@ export default function RegisterPage() {
         password,
         options: {
           data: { name },
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
         },
       });
 
@@ -58,14 +59,59 @@ export default function RegisterPage() {
         return;
       }
 
-      router.push('/login?registered=true');
+      setRegistered(true);
     } catch (err) {
       console.error('Registration error:', err);
-      setError('An unexpected error occurred. Please try again.');
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(`Connection error: ${msg}. Check that Supabase env vars are set in Amplify.`);
     } finally {
       setIsLoading(false);
     }
   };
+
+  if (registered) {
+    return (
+      <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center p-6">
+        <div className="fixed inset-0 bg-gradient-mesh pointer-events-none" />
+        <div className="w-full max-w-md relative z-10">
+          <div className="flex items-center justify-center gap-3 mb-10">
+            <div className="w-12 h-12 rounded-[var(--radius-xl)] bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center shadow-lg">
+              <Building2 className="w-6 h-6 text-[var(--bg-primary)]" />
+            </div>
+            <span className="text-2xl font-bold tracking-tight">LIMIT</span>
+          </div>
+          <Card variant="elevated" padding="lg">
+            <CardContent>
+              <div className="text-center py-6">
+                <div className="w-16 h-16 rounded-full bg-[var(--success-bg)] flex items-center justify-center mx-auto mb-4">
+                  <Mail className="w-8 h-8 text-[var(--success)]" />
+                </div>
+                <h3 className="text-xl font-semibold text-[var(--text-primary)] mb-2">
+                  Check your email
+                </h3>
+                <p className="text-[var(--text-secondary)] text-sm mb-2">
+                  We sent a confirmation link to
+                </p>
+                <p className="font-medium text-[var(--text-primary)] mb-4">{email}</p>
+                <p className="text-[var(--text-muted)] text-xs mb-6">
+                  Click the link in the email to verify your account. Check your spam folder if you don't see it.
+                </p>
+                <Button
+                  variant="primary"
+                  size="lg"
+                  fullWidth
+                  onClick={() => router.push('/login')}
+                >
+                  Go to Login
+                  <ArrowRight className="w-5 h-5" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)] flex">
