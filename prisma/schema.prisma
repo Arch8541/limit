@@ -85,8 +85,7 @@ model VerificationToken {
 
 model Project {
   id               String   @id @default(cuid())
-  userId           String
-  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId           String   // Supabase Auth UUID — no FK to User table
 
   // Basic Info
   name             String   @db.VarChar(200)
