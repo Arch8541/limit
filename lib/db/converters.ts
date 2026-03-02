@@ -1,4 +1,3 @@
-import { Project as PrismaProject } from '@prisma/client';
 import { Project, SiteData } from '@/types';
 
 export function dbProjectToAppProject(dbProject: any): Project {

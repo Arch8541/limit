@@ -1,5 +1,6 @@
 // Prisma Schema for LIMIT Platform - Supabase PostgreSQL
 // Version: 2.0.0 - Production Ready
+// Auth: Supabase Auth (users managed in auth.users, not Prisma)
 
 generator client {
   provider      = "prisma-client-js"
@@ -10,73 +11,6 @@ datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
-}
-
-// ============================================================================
-// USER & AUTHENTICATION MODELS
-// ============================================================================
-
-model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  emailVerified DateTime?
-  name          String?
-  password      String?
-  image         String?
-
-  // Relationships
-  projects      Project[]
-  accounts      Account[]
-  sessions      Session[]
-
-  // Timestamps
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  // Indexes
-  @@index([email])
-  @@index([createdAt])
-}
-
-model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-  @@index([userId])
-}
-
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([expires])
-}
-
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-
-  @@unique([identifier, token])
-  @@index([expires])
 }
 
 // ============================================================================
